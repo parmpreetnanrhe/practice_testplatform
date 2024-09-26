@@ -4,16 +4,16 @@ import { Headings } from './Headings';
 
 export const MainHeader = () => {
   return (
-    <header>
+    <header className="header">
       <div>
         <Headings type={1} title="Main Title" className="main-title" text="Welcome to My Site" />
       </div>
       <div>
         <Button
           type="button"
-          title="Click me!"
+          title="Dashboard"
           className="my-button"
-          text="Click Me"
+          text="Dashboard"
           onClick = {() => console.log('Submit clicked!')}
         />
       </div>
