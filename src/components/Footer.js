@@ -8,28 +8,31 @@ export const Footer = ({ onPrevious, onNext, currentQuestionIndex, totalQuestion
         <Button
           type="button"
           title="Submit"
-          className="my-button"
-          text="Submit"
+          className="commonBtn"
           onClick={() => console.log('Submit clicked!')}
-        />
+        >
+          Submit
+        </Button>
       </div>
       <div>
         <Button
           type="button"
           title="Previous"
-          className="my-button"
-          text="Previous"
+          className="commonBtn"
           onClick={onPrevious}
           disabled={currentQuestionIndex === 0} // Disable if at first question
-        />
+        >
+          Previous
+        </Button>
         <Button
           type="button"
           title="Next"
-          className="my-button"
-          text="Next"
+          className="commonBtn"
           onClick={onNext}
           disabled={currentQuestionIndex === totalQuestions - 1} // Disable if at last question
-        />
+        >
+          Next
+        </Button>
       </div>
     </footer>
   );
