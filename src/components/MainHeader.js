@@ -21,7 +21,7 @@ export const MainHeader = () => {
           onClick={() => console.log("Submit clicked!")}
         >
           Dashboard
-        </Button> 
+        </Button>
       </div>
     </header>
   );
