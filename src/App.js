@@ -7,7 +7,7 @@ import LeftQuestionArea from './components/LeftQuestionArea';
 import QuestionArea from './components/QuestionArea';
  
 
-
+ 
 function App() {
   return (
     <>
