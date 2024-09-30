@@ -200,3 +200,11 @@ body::-webkit-scrollbar-thumb:hover {
 .question-box-container{
   display: flex;
 }
+
+.question-box-container .ques-box{
+  border: 1px solid black;
+  height: 40px;
+  width: 40px;
+  padding: 10px;
+  gap: 2;
+}
