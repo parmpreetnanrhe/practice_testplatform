@@ -22,7 +22,7 @@ export const Footer = ({ onPrevious, onNext, currentQuestionIndex, totalQuestion
           onClick={onPrevious}
           disabled={currentQuestionIndex === 0} // Disable if at first question
         >
-          Previous
+          <img src={`${process.env.PUBLIC_URL}/img/backIcon.svg`}/> Previous
         </Button>
         <Button
           type="button"
@@ -31,7 +31,7 @@ export const Footer = ({ onPrevious, onNext, currentQuestionIndex, totalQuestion
           onClick={onNext}
           disabled={currentQuestionIndex === totalQuestions - 1} // Disable if at last question
         >
-          Next
+          Next <img src={`${process.env.PUBLIC_URL}/img/nextIcon.svg`}/>
         </Button>
       </div>
     </footer>
