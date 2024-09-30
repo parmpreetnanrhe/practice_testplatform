@@ -8,13 +8,13 @@ export const Footer = ({ onPrevious, onNext, currentQuestionIndex, totalQuestion
         <Button
           type="button"
           title="Submit"
-          className="commonBtn"
+          className="commonBtn submitBtn"
           onClick={() => console.log('Submit clicked!')}
         >
           Submit
         </Button>
       </div>
-      <div>
+      <div className="nxtPrevBtn">
         <Button
           type="button"
           title="Previous"

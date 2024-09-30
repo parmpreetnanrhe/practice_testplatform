@@ -17,7 +17,9 @@ export default function QuestionArea() {
   };
 
   return (
+    <>
     <div className="question-container">
+
       {questionData.length > 0 && (
         <div className="single-question">
           <h3>{currentQuestionIndex}{questionData[currentQuestionIndex].question}</h3>
@@ -53,12 +55,13 @@ export default function QuestionArea() {
         onClick={handleNextClick}
         disabled={currentQuestionIndex === 0} // Disable if at the first question
       />  */}
+    </div>
       <Footer
         onPrevious={handlePreviousClick}
         onNext={handleNextClick}
         currentQuestionIndex={currentQuestionIndex}
         totalQuestions={questionData.length}
       />
-    </div>
+    </>
   );
 }

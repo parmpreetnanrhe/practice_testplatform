@@ -21,7 +21,7 @@ export default function SubHeader() {
           text="10:20 min"
         />
       </div>
-      <div class="subHeaderIconBar">
+      <div className="subHeaderIconBar">
         <Button
           type="button"
           title="Flag"
