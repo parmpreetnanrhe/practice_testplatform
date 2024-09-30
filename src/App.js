@@ -10,7 +10,7 @@ import TestInfoContextProvider from './contexts/TestInfoContext';
 import TestStartTimer from './components/TestStartTimer';
 import Pallet from './components/Pallet';
 
-
+ 
 function App() {
   return (
     <UserInfoContextProvider>
