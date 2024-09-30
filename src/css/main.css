@@ -1,0 +1,66 @@
+* {
+    box-sizing: border-box;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between; /* Space between logo and nav */
+    align-items: center;            /* Center items vertically */
+    padding: 10px 20px;            /* Padding around the header */
+    background-color: #282c34;     /* Background color */
+    color: white;  
+    height: 2rem;  
+    
+}
+
+.sub-header{
+    display: flex;
+    justify-content: space-between; /* Space between logo and nav */
+    align-items: center;            /* Center items vertically */
+    padding: 10px 20px;            /* Padding around the header */
+    background-color: white;     /* Background color */
+    color: grey;  
+    height: 3rem;  
+    border-bottom: 2px solid #a7aaab; /* Border at the bottom */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Shadow effect */
+} 
+
+.footer {
+    position: fixed;                /* Fixes the footer to the bottom */
+    bottom: 0;                     /* Aligns the footer to the bottom */
+    left: 0;                       /* Aligns the footer to the left */
+    width: 100%;                   /* Full width */
+    height: 3rem;                  /* Height of the footer */
+    background-color: #282c34;    /* Background color */
+    color: white;                  /* Text color */
+    display: flex;                 /* Flexbox for centering content */
+    justify-content: space-between;       /* Center content horizontally */
+    align-items: center;           /* Center content vertically */
+    border-top: 2px solid #909292; /* Top border for separation */
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); /* Shadow effect */
+    padding: 10px;
+}
+
+ button{
+    padding: 5px 10px;
+    cursor: pointer;
+ }
+
+ .question-container {
+    display: flex;               /* Use flexbox for centering */
+    flex-direction: column;     /* Stack children vertically */
+    align-items: center;        /* Center horizontally */
+    justify-content: center;     /* Center vertically (if a height is defined) */
+    min-height: 100vh;          /* Ensure it takes full height of the viewport */
+    padding: 20px;              /* Add some padding if needed */
+  }
+  
+  .single-question {
+    margin: 10px 0;            /* Add spacing between questions */
+    text-align: center;        /* Center text inside each question */
+  }
+  
+ .single-question label{
+    cursor: pointer;
+ }
+ 
