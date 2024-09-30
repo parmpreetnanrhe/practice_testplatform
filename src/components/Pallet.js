@@ -12,7 +12,7 @@ export default function Pallet() {
   return (
     <>
       <div className={`pallet-button ${isPalletOpen ? 'pallet-button-move' : ''}`}>
-        <Button 
+        <Button
           type="button"
           title="Expand"
           className="right-button"
@@ -20,11 +20,19 @@ export default function Pallet() {
           onClick={togglePanel} ></Button>
       </div>
       <div className={`side-panel ${isPalletOpen ? 'open' : ''}`}>
-        <SelectComponent
-          options={['All', 'Correct', 'Incorrect', 'Un-attempted', 'Flagged']}
-          onSelectChange=""
-          defaultText="Please select a value"
-        />
+        <div className="select-pallet-tag">
+          <SelectComponent
+            options={['All', 'Correct', 'Incorrect', 'Un-attempted', 'Flagged']}
+            onSelectChange=""
+            defaultText="Please select a value"
+          />
+        </div>
+        <div className='questtion-box-container'>
+            <div qid="1" className='ques-box'><span>1</span></div>
+            <div qid="2" className='ques-box'><span>2</span></div>
+            <div qid="3" className='ques-box'><span>3</span></div>
+            <div qid="4" className='ques-box'><span>4</span></div>
+        </div>
       </div>
     </>
   )

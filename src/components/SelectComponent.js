@@ -12,7 +12,7 @@ const SelectComponent = ({ options, onSelectChange, defaultText = "Select an opt
   };
 
   return (
-    <div>
+    <>
       <select value={selectedValue} onChange={handleChange}>
         <option value="" disabled>{defaultText}</option>
         {options.map((option, index) => (
@@ -22,7 +22,7 @@ const SelectComponent = ({ options, onSelectChange, defaultText = "Select an opt
         ))}
       </select>
       {selectedValue && <p>You selected: {selectedValue}</p>}
-    </div>
+    </>
   );
 };
 
