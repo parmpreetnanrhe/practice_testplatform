@@ -74,29 +74,7 @@ export default function QuestionArea() {
           </div>
         )}
       </form>
-    </div>
-    <div> 
-
-      {questionData.length > 0 && (
-        <div className="single-question">
-          <h3>{currentQuestionIndex}{questionData[currentQuestionIndex].question}</h3>
-          {['A', 'B', 'C', 'D'].map((option) => (
-            <div key={option}>
-              <Input
-                type="checkbox"
-                id={`${currentQuestionIndex}-${option}`}
-                name={option}
-                // Here we can manage checkbox states as needed
-                onChange={() => { }}
-              />
-              <label htmlFor={`${currentQuestionIndex}-${option}`}>
-                {`${option}: ${questionData[currentQuestionIndex][option]}`}
-              </label>
-            </div>
-          ))}
-        </div>
-      )} 
-    </div>
+    </div> 
     <div>
       <Footer
         onPrevious={handlePreviousClick}

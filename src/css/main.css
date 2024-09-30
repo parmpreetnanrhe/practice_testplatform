@@ -1,66 +1,241 @@
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
+  font-family: "Arial";
+}
+button{
+  cursor: pointer;
+}
+body {
+  font-size: 1rem;
+  margin: 0;
+  padding: 0;
+  font-family: "Arial";
 }
 
 .header {
-    display: flex;
-    justify-content: space-between; /* Space between logo and nav */
-    align-items: center;            /* Center items vertically */
-    padding: 10px 20px;            /* Padding around the header */
-    background-color: #282c34;     /* Background color */
-    color: white;  
-    height: 2rem;  
-    
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.625rem 0.938rem;
+  background-color: #2a404b;
 }
 
-.sub-header{
-    display: flex;
-    justify-content: space-between; /* Space between logo and nav */
-    align-items: center;            /* Center items vertically */
-    padding: 10px 20px;            /* Padding around the header */
-    background-color: white;     /* Background color */
-    color: grey;  
-    height: 3rem;  
-    border-bottom: 2px solid #a7aaab; /* Border at the bottom */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Shadow effect */
-} 
+.headerTitle {
+  font-size: 1.2rem;
+  margin: 0;
+  color: #ffffff;
+}
+
+.sub-header {
+  display: grid;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.625rem 0.938rem;
+  background-color: #ffffff;
+  box-shadow: 0 4px 5px rgba(0, 0, 0, 0.2);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
 
 .footer {
-    position: fixed;                /* Fixes the footer to the bottom */
-    bottom: 0;                     /* Aligns the footer to the bottom */
-    left: 0;                       /* Aligns the footer to the left */
-    width: 100%;                   /* Full width */
-    height: 3rem;                  /* Height of the footer */
-    background-color: #282c34;    /* Background color */
-    color: white;                  /* Text color */
-    display: flex;                 /* Flexbox for centering content */
-    justify-content: space-between;       /* Center content horizontally */
-    align-items: center;           /* Center content vertically */
-    border-top: 2px solid #909292; /* Top border for separation */
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); /* Shadow effect */
-    padding: 10px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #FFFFFF;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 0.5rem solid #eaebef;
+  padding: 0.625rem 0.938rem;
 }
 
- button{
-    padding: 5px 10px;
-    cursor: pointer;
- }
+.commonBtn {
+  background: #4e9bcc;
+  border: none;
+  color: #ffffff;
+  border-radius: 4px;
+  font-size: 1rem;
+  padding: 0rem 1rem;
+  line-height: 2;
+  cursor: pointer;
+}
 
- .question-container {
-    display: flex;               /* Use flexbox for centering */
-    flex-direction: column;     /* Stack children vertically */
-    align-items: center;        /* Center horizontally */
-    justify-content: center;     /* Center vertically (if a height is defined) */
-    min-height: 100vh;          /* Ensure it takes full height of the viewport */
-    padding: 20px;              /* Add some padding if needed */
-  }
+.question-container {
+  height: calc(100svh - 10.98rem);
+  padding: 1.25rem;
+  overflow: auto;
+}
+
+.single-question {
+  margin: 0.625rem 0; /* Add spacing between questions */
+  text-align: center; /* Center text inside each question */
+}
+
+.single-question label {
+  cursor: pointer;
+}
+
+
+
+
+.pallet-button {
+  position: fixed;
+  right: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 1px 2px;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: right 0.3s ease;
+}
+
+.pallet-button button {
+  background-color: #7472e6;
+  width: 10px;
+  height: 30px;
+  color: white;
+}
+
+.pallet-button-move {
+  right: 300px;
+  transition: right 0.3s ease;
+}
+
+.side-panel {
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 300px;
+  height: 100%;
+  background-color: #f1f1f1;
+  box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.5);
+  transition: right 0.3s ease;
+  padding: 20px;
+}
+
+.side-panel.open {
+  right: 0;
+}
+
+.side-panel h2 {
+  margin-top: 0;
+}
+
+.side-panel button {
+  background-color: #ff4b4b;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.side-panel button:hover {
+  background-color: #ff3333;
+}
+
+.select-pallet-tag select{
+  width: 100%;
+  height: 40px;
+  appearance: none; 
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 10px;
+  padding-right: 40px;  
+  border-radius: 2px;
+  position: relative;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 6"><polygon points="0,0 10,0 5,6" fill="#333" /></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 10px;
+  cursor: pointer;
   
-  .single-question {
-    margin: 10px 0;            /* Add spacing between questions */
-    text-align: center;        /* Center text inside each question */
-  }
-  
- .single-question label{
-    cursor: pointer;
- }
- 
+}
+
+/* Customize the width of the scrollbar */
+body::-webkit-scrollbar {
+  width: 8px; /* Adjust the width of the scrollbar */
+}
+
+/* The track (background of the scrollbar) */
+body::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Optional: background of the track */
+}
+
+/* The draggable part of the scrollbar (thumb) */
+body::-webkit-scrollbar-thumb {
+  background-color: #888; /* Color of the thumb */
+  border-radius: 10px;     /* Optional: rounded corners */
+  border: 2px solid #f1f1f1; /* Optional: border around the thumb */
+}
+
+/* Thumb when hovered */
+body::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Darker color on hover */
+}
+
+.question-box-container{
+  display: flex;
+}
+
+.question-box-container .ques-box{
+  border: 1px solid black;
+  height: 40px;
+  width: 40px;
+  padding: 10px;
+  gap: 2;
+}
+.main-title {
+  color: #636060;
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.subHeaderIconBar {
+  display: flex;
+  justify-content: end;
+  gap: 1rem;
+}
+
+.subHeaderIconBar .iconBtn {
+  display: grid;
+  align-items: end;
+  padding: 0;
+  background: transparent;
+  color: #636060;
+  font-size: 0.75rem;
+  gap: 0.5rem;
+}
+
+.subHeaderIconBar .iconBtn img {
+  margin: auto;
+}
+
+.timerTitle {
+  margin: 0;
+}
+
+.subHeaderIconBar .iconBtn span {
+  line-height: 1.3;
+}
+
+.timerTitle {
+  margin: 0;
+  text-align: center;
+  color: #636060;
+}
+
+.commonBtn.submitBtn {
+  background: #006eae;
+}
+
+.commonBtn.submitBtn {
+  background: #006eae;
+  padding: 0rem 1.5rem;
+  font-size: 0.875rem;
+}

@@ -17,12 +17,11 @@ const TestInfoData = useContext(TestInfoContext);
         />
       </div>
       <div>
-        <Headings type={2} title="Main Title" className="main-title" text={testTimeStarts} />
         <Headings
           type={2}
           title="Timer"
           className="timerTitle"
-          text="10:20 min"
+          text={`${testTimeStarts} min`}
         />
       </div>
       <div className="subHeaderIconBar">
