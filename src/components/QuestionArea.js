@@ -1,14 +1,19 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { questionData } from '../questionsData';
 import Input from './Input';
 import { Footer } from './Footer';
-import { Button } from './Button'; 
+import { Button } from './Button';
+import { UserInfoAuthContext } from '../contexts/UserInfoContext';
 
 export default function QuestionArea() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [selectedAnswers, setSelectedAnswers] = useState({}); // Store user Answer Selection
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleNextClick = () => {
-    console.log("click NEXT");
+  const checkUserAuth = useContext(UserInfoAuthContext);
+
+
+  const handleNextClick = () => { 
     setCurrentQuestionIndex((prevIndex) => Math.min(prevIndex + 1, questionData.length - 1));
   };
 
@@ -16,49 +21,70 @@ export default function QuestionArea() {
     setCurrentQuestionIndex((prevIndex) => Math.max(prevIndex - 1, 0));
   };
 
+  const handleCheckboxChange = (option) => {
+    setSelectedAnswers((prevState) => ({
+      ...prevState,
+      [currentQuestionIndex]: option,
+    }));
+  };
+
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Prevent page refresh
+    setIsSubmitted(true);
+    console.log('Selected Answers: ', selectedAnswers);
+    alert('Test Submitted!');
+  };
+ 
+  useEffect(() => {
+    checkUserAuth.isUserLogin(); 
+    if(checkUserAuth.userInfo == true){
+    fetch("https://api.github.com/users")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+      });
+    }else{
+      alert("userLogout");
+    }
+  }, [checkUserAuth.userInfo]);
+
   return (
+    <>
     <div className="question-container">
-      {questionData.length > 0 && (
-        <div className="single-question">
-          <h3>{currentQuestionIndex}{questionData[currentQuestionIndex].question}</h3>
-          {['A', 'B', 'C', 'D'].map((option) => (
-            <div key={option}>
-              <Input
-                type="checkbox"
-                id={`${currentQuestionIndex}-${option}`}
-                name={option}
-                // Here we can manage checkbox states as needed
-                onChange={() => { }}
-              />
-              <label htmlFor={`${currentQuestionIndex}-${option}`}>
-                {`${option}: ${questionData[currentQuestionIndex][option]}`}
-              </label>
-            </div>
-          ))}
-        </div>
-      )}
-      {/* <Button
-        type="button"
-        title="Previous"
-        className="my-button"
-        text="Previous"
-        onClick={handlePreviousClick}
-        disabled={currentQuestionIndex === 0} // Disable if at the first question
-      /> 
-            <Button
-        type="button"
-        title="Previous"
-        className="my-button"
-        text="Previous"
-        onClick={handleNextClick}
-        disabled={currentQuestionIndex === 0} // Disable if at the first question
-      />  */}
-      <Footer
+      <form onSubmit={handleSubmit}>
+        {questionData.length > 0 && (
+          <div className="single-question">
+            <h3>{currentQuestionIndex}{questionData[currentQuestionIndex].question}</h3>
+            {['A', 'B', 'C', 'D'].map((option) => (
+              <div key={option}>
+                <Input
+                  type="radio"
+                  id={`${currentQuestionIndex}-${option}`}
+                  name={`${currentQuestionIndex}`}
+                  // Here we can manage checkbox states as needed
+                  checked={selectedAnswers[currentQuestionIndex] === option}
+                  onChange={() => handleCheckboxChange(option)}
+                />
+                <label htmlFor={`${currentQuestionIndex}-${option}`}>
+                  {`${option}: ${questionData[currentQuestionIndex][option]}`}
+                </label>
+              </div>
+            ))}
+          </div>
+        )}
+      </form>
+    </div>
+    <div>
+
+<Footer
+        onSubmit={handleSubmit}
         onPrevious={handlePreviousClick}
         onNext={handleNextClick}
         currentQuestionIndex={currentQuestionIndex}
         totalQuestions={questionData.length}
       />
     </div>
+  </>
   );
 }

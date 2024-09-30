@@ -1,15 +1,16 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Button } from './Button';
 import { Headings } from './Headings';
-
-export default function SubHeader() {
+import { TestInfoContext } from '../contexts/TestInfoContext';
+export default function SubHeader({ testTimeStarts }) {
+  const TestInfoData = useContext(TestInfoContext); 
   return (
     <header className="sub-header">
       <div>
         <Headings type={1} title="Main Title" className="main-title" text="Verbal" />
       </div>
       <div>
-        <Headings type={2} title="Main Title" className="main-title" text="10:20" />
+        <Headings type={2} title="Main Title" className="main-title" text={testTimeStarts} />
       </div>
       <div>
         <Button

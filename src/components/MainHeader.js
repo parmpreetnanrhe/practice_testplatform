@@ -3,6 +3,7 @@ import { Button } from './Button';
 import { Headings } from './Headings';
 
 export const MainHeader = () => {
+
   return (
     <header className="header">
       <div>

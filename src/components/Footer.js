@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from './Button';
 
-export const Footer = ({ onPrevious, onNext, currentQuestionIndex, totalQuestions }) => {
+export const Footer = ({ onSubmit , onPrevious, onNext, currentQuestionIndex, totalQuestions }) => {
   return (
     <footer className="footer">
       <div>
@@ -10,7 +10,7 @@ export const Footer = ({ onPrevious, onNext, currentQuestionIndex, totalQuestion
           title="Submit"
           className="my-button"
           text="Submit"
-          onClick={() => console.log('Submit clicked!')}
+          onClick={onSubmit}
         />
       </div>
       <div>
