@@ -2,9 +2,11 @@
   box-sizing: border-box;
   font-family: "Arial";
 }
-button{
+
+button {
   cursor: pointer;
 }
+
 body {
   font-size: 1rem;
   margin: 0;
@@ -61,24 +63,15 @@ body {
   cursor: pointer;
 }
 
-.question-container {
-  height: calc(100svh - 10.98rem);
-  padding: 1.25rem;
-  overflow: auto;
-}
-
 .single-question {
-  margin: 0.625rem 0; /* Add spacing between questions */
-  text-align: center; /* Center text inside each question */
+  margin: 0.625rem 0; 
+  text-align: center; 
 }
 
 .single-question label {
   cursor: pointer;
 }
-
-
-
-
+ 
 .pallet-button {
   position: fixed;
   right: 0px;
@@ -93,10 +86,11 @@ body {
 }
 
 .pallet-button button {
-  background-color: #7472e6;
-  width: 10px;
+  background-color: #006eae;
+  width: 20px;
   height: 30px;
   color: white;
+  border: 0;
 }
 
 .pallet-button-move {
@@ -137,16 +131,17 @@ body {
   background-color: #ff3333;
 }
 
-.select-pallet-tag select{
+.select-pallet-tag select {
   width: 100%;
   height: 40px;
-  appearance: none; 
+  margin-bottom: 10px;
+  appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-color: #f0f0f0;
+  background-color: #e3e3e3;
   border: 1px solid #ccc;
   padding: 10px;
-  padding-right: 40px;  
+  padding-right: 40px;
   border-radius: 2px;
   position: relative;
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 6"><polygon points="0,0 10,0 5,6" fill="#333" /></svg>');
@@ -154,42 +149,55 @@ body {
   background-position: right 10px center;
   background-size: 10px;
   cursor: pointer;
-  
+  outline: none;           
+
 }
 
-/* Customize the width of the scrollbar */
+.select-pallet-tag select option {
+  padding: 10px;                   
+  background-color: #fff;       
+  color: #333;           
+}
+
+.select-pallet-tag select option:hover {
+  background-color: #f1f1f1;   
+}
+
 body::-webkit-scrollbar {
-  width: 8px; /* Adjust the width of the scrollbar */
+  width: 8px;
 }
 
-/* The track (background of the scrollbar) */
 body::-webkit-scrollbar-track {
-  background: #f1f1f1; /* Optional: background of the track */
+  background: #f1f1f1;
 }
 
-/* The draggable part of the scrollbar (thumb) */
 body::-webkit-scrollbar-thumb {
-  background-color: #888; /* Color of the thumb */
-  border-radius: 10px;     /* Optional: rounded corners */
-  border: 2px solid #f1f1f1; /* Optional: border around the thumb */
+  background-color: #888;
+  border-radius: 10px;
+  border: 2px solid #f1f1f1;
 }
 
-/* Thumb when hovered */
 body::-webkit-scrollbar-thumb:hover {
-  background-color: #555; /* Darker color on hover */
+  background-color: #555;
 }
 
-.question-box-container{
-  display: flex;
+.question-box-container {
+  display: flex; 
+  flex-wrap: wrap;  
 }
 
-.question-box-container .ques-box{
+.question-box-container .ques-box {
   border: 1px solid black;
   height: 40px;
-  width: 40px;
-  padding: 10px;
-  gap: 2;
+  width: 42px;
+  border-radius: 4px;
+  margin: 5px;
+  text-align: center;
+  line-height: 3;
+  font-size: 13px; 
+  cursor: pointer;
 }
+
 .main-title {
   color: #636060;
   font-size: 1.2rem;
@@ -237,5 +245,90 @@ body::-webkit-scrollbar-thumb:hover {
 .commonBtn.submitBtn {
   background: #006eae;
   padding: 0rem 1.5rem;
-  font-size: 0.875rem;
+  font-size: 1rem;
+}
+
+.quesActive{
+  background-color: #555;
+  color: #f0f0f0;
+}
+.nxtPrevBtn{
+  display: flex;
+}
+.prev-Btn{
+  background: #d3d3d3; 
+  color: black;
+  border-radius: 4px;
+  font-size: 1rem;
+  padding: 0rem 1rem;
+  line-height: 2; 
+  margin-right: 20px;
+
+}
+.next-Btn{
+  background: #d3d3d300; 
+  color: black;
+  border-radius: 4px;
+  font-size: 1rem;
+  padding: 0rem 1rem;
+  line-height: 2; 
+  border: 1px solid #4e9bcc;
+}
+
+
+.question-main-container {
+  height: calc(100svh - 10.98rem);
+  padding: 1.25rem;
+  overflow: auto;
+  display: flex;
+  text-align: center;
+  flex-direction: column;
+  align-items: center;
+}
+.question-container{
+  width: 50%;
+}
+
+.question-header{ 
+  background-color: #e5e5e5; 
+  height: 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  line-height: 2.5;
+  border-radius: 5px;
+}
+
+.ques-cnt {
+  background-color: #666666;
+  height: 2.5rem;
+  width: 2rem;
+  color: white;  
+  border-radius: 5px 0 0 5px;
+}
+ 
+.abc-badging {
+  position: relative; 
+  color: black;
+  display: inline-block;
+  overflow: hidden;
+  line-height: 2.5;
+  margin-right: 0.5rem;
+}
+
+.abc-badging::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: -4px;
+  width: 100%;
+  height: 2%;
+  background: black;
+  transform: rotate(325deg);
+  transform-origin: top right;
+  z-index: 6;
+}
+
+.abc-badging span {
+  position: relative;  
+  z-index: 2;    
 }

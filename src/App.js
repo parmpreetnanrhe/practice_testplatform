@@ -9,17 +9,18 @@ import UserInfoContextProvider from './contexts/UserInfoContext';
 import TestInfoContextProvider from './contexts/TestInfoContext';
 import TestStartTimer from './components/TestStartTimer';
 import Pallet from './components/Pallet';
+import QuestionDataContext from './contexts/QuestionDataContext';
 
- 
+
 function App() {
   return (
     <UserInfoContextProvider>
       <TestInfoContextProvider>
-        <MainHeader />
-        <TestStartTimer />
-        <QuestionArea />
-        <Pallet/>
-        {/* <Footer /> */}
+        <QuestionDataContext>
+          <MainHeader />
+          <TestStartTimer />
+          {/* <Footer /> */}
+        </QuestionDataContext>
       </TestInfoContextProvider>
     </UserInfoContextProvider>
 

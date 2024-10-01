@@ -1,13 +1,16 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Button } from './Button'
 import SelectComponent from './SelectComponent';
+import { QuestionDataContext } from '../contexts/QuestionDataContext';
 
-export default function Pallet() {
+export default function Pallet({ pallteclickdOnQuestion, currentQuestionIndex }) {
   const [isPalletOpen, setIsPalletOpen] = useState(false);
-
+  const getQuestionDataContext = useContext(QuestionDataContext);
+ 
   const togglePanel = () => {
     setIsPalletOpen(!isPalletOpen);
   };
+
 
   return (
     <>
@@ -17,7 +20,13 @@ export default function Pallet() {
           title="Expand"
           className="right-button"
           text="<"
-          onClick={togglePanel} ></Button>
+          onClick={togglePanel} >
+          <img
+            src={`${process.env.PUBLIC_URL}/img/whitebackicon.svg`}
+            style={isPalletOpen ? { transform: 'rotate(539deg)' } : {}}
+            alt="Arrow Icon"
+          />
+        </Button>
       </div>
       <div className={`side-panel ${isPalletOpen ? 'open' : ''}`}>
         <div className="select-pallet-tag">
@@ -33,10 +42,15 @@ export default function Pallet() {
           />
         </div>
         <div className='question-box-container'>
-            <div qid="1" className='ques-box'><span>1</span></div>
-            <div qid="2" className='ques-box'><span>2</span></div>
-            <div qid="3" className='ques-box'><span>3</span></div>
-            <div qid="4" className='ques-box'><span>4</span></div>
+          {getQuestionDataContext.questionDatainfo.length > 0 && (
+            getQuestionDataContext.questionDatainfo.map((qid, index) => (
+              <div  key={index} 
+              className={`ques-box ${index === currentQuestionIndex ? "quesActive" : ""}`} 
+              onClick={() => pallteclickdOnQuestion(index)}><span>{index + 1}</span></div>
+            )
+              // <div qid="1" className='ques-box'><span>1</span></div>
+            ))}
+
         </div>
       </div>
     </>

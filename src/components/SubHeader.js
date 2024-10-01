@@ -3,7 +3,7 @@ import { Button } from './Button';
 import { Headings } from './Headings';
 import { TestInfoContext } from '../contexts/TestInfoContext';
 
-export default function SubHeader({ testTimeStarts }) {
+export default function SubHeader({ testTimeStarts ,currentQuestionCount }) {
 const TestInfoData = useContext(TestInfoContext);  
 
   return (
@@ -13,7 +13,7 @@ const TestInfoData = useContext(TestInfoContext);
           type={1}
           title="Main Title"
           className="main-title"
-          text="Verbal Ability | Question: 55"
+          text={`Verbal Ability | Question: ${currentQuestionCount }`}
         />
       </div>
       <div>
@@ -21,7 +21,7 @@ const TestInfoData = useContext(TestInfoContext);
           type={2}
           title="Timer"
           className="timerTitle"
-          text={`${testTimeStarts} min`}
+          text={`${testTimeStarts}`}
         />
       </div>
       <div className="subHeaderIconBar">
