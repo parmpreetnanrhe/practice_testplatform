@@ -1,8 +1,11 @@
-import React from "react";
-import { Button } from "./Button";
-import { Headings } from "./Headings";
+import React, { useContext } from 'react';
+import { Button } from './Button';
+import { Headings } from './Headings';
+import { TestInfoContext } from '../contexts/TestInfoContext';
 
-export default function SubHeader() {
+export default function SubHeader({ testTimeStarts ,currentQuestionCount }) {
+const TestInfoData = useContext(TestInfoContext);  
+
   return (
     <header className="sub-header">
       <div>
@@ -10,7 +13,7 @@ export default function SubHeader() {
           type={1}
           title="Main Title"
           className="main-title"
-          text="Verbal Ability | Question: 55"
+          text={`Verbal Ability | Question: ${currentQuestionCount }`}
         />
       </div>
       <div>
@@ -18,7 +21,7 @@ export default function SubHeader() {
           type={2}
           title="Timer"
           className="timerTitle"
-          text="10:20 min"
+          text={`${testTimeStarts}`}
         />
       </div>
       <div className="subHeaderIconBar">

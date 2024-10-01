@@ -3,6 +3,10 @@
   font-family: "Arial";
 }
 
+button {
+  cursor: pointer;
+}
+
 body {
   font-size: 1rem;
   margin: 0;
@@ -59,18 +63,138 @@ body {
   cursor: pointer;
 }
 
-.question-container {
-  height: calc(100svh - 10.98rem);
-  padding: 1.25rem;
-  overflow: auto;
-}
-
 .single-question {
-  margin: 0.625rem 0; /* Add spacing between questions */
-  text-align: center; /* Center text inside each question */
+  margin: 0.625rem 0; 
+  text-align: center; 
 }
 
 .single-question label {
+  cursor: pointer;
+}
+ 
+.pallet-button {
+  position: fixed;
+  right: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 1px 2px;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: right 0.3s ease;
+}
+
+.pallet-button button {
+  background-color: #006eae;
+  width: 20px;
+  height: 30px;
+  color: white;
+  border: 0;
+}
+
+.pallet-button-move {
+  right: 300px;
+  transition: right 0.3s ease;
+}
+
+.side-panel {
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 300px;
+  height: 100%;
+  background-color: #f1f1f1;
+  box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.5);
+  transition: right 0.3s ease;
+  padding: 20px;
+}
+
+.side-panel.open {
+  right: 0;
+}
+
+.side-panel h2 {
+  margin-top: 0;
+}
+
+.side-panel button {
+  background-color: #ff4b4b;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.side-panel button:hover {
+  background-color: #ff3333;
+}
+
+.select-pallet-tag select {
+  width: 100%;
+  height: 40px;
+  margin-bottom: 10px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: #e3e3e3;
+  border: 1px solid #ccc;
+  padding: 10px;
+  padding-right: 40px;
+  border-radius: 2px;
+  position: relative;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 6"><polygon points="0,0 10,0 5,6" fill="#333" /></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 10px;
+  cursor: pointer;
+  outline: none;           
+
+}
+
+.select-pallet-tag select option {
+  padding: 10px;                   
+  background-color: #fff;       
+  color: #333;           
+}
+
+.select-pallet-tag select option:hover {
+  background-color: #f1f1f1;   
+}
+
+body::-webkit-scrollbar {
+  width: 8px;
+}
+
+body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 10px;
+  border: 2px solid #f1f1f1;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+.question-box-container {
+  display: flex; 
+  flex-wrap: wrap;  
+}
+
+.question-box-container .ques-box {
+  border: 1px solid black;
+  height: 40px;
+  width: 42px;
+  border-radius: 4px;
+  margin: 5px;
+  text-align: center;
+  line-height: 3;
+  font-size: 13px; 
   cursor: pointer;
 }
 
@@ -121,5 +245,90 @@ body {
 .commonBtn.submitBtn {
   background: #006eae;
   padding: 0rem 1.5rem;
-  font-size: 0.875rem;
+  font-size: 1rem;
+}
+
+.quesActive{
+  background-color: #555;
+  color: #f0f0f0;
+}
+.nxtPrevBtn{
+  display: flex;
+}
+.prev-Btn{
+  background: #d3d3d3; 
+  color: black;
+  border-radius: 4px;
+  font-size: 1rem;
+  padding: 0rem 1rem;
+  line-height: 2; 
+  margin-right: 20px;
+
+}
+.next-Btn{
+  background: #d3d3d300; 
+  color: black;
+  border-radius: 4px;
+  font-size: 1rem;
+  padding: 0rem 1rem;
+  line-height: 2; 
+  border: 1px solid #4e9bcc;
+}
+
+
+.question-main-container {
+  height: calc(100svh - 10.98rem);
+  padding: 1.25rem;
+  overflow: auto;
+  display: flex;
+  text-align: center;
+  flex-direction: column;
+  align-items: center;
+}
+.question-container{
+  width: 50%;
+}
+
+.question-header{ 
+  background-color: #e5e5e5; 
+  height: 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  line-height: 2.5;
+  border-radius: 5px;
+}
+
+.ques-cnt {
+  background-color: #666666;
+  height: 2.5rem;
+  width: 2rem;
+  color: white;  
+  border-radius: 5px 0 0 5px;
+}
+ 
+.abc-badging {
+  position: relative; 
+  color: black;
+  display: inline-block;
+  overflow: hidden;
+  line-height: 2.5;
+  margin-right: 0.5rem;
+}
+
+.abc-badging::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: -4px;
+  width: 100%;
+  height: 2%;
+  background: black;
+  transform: rotate(325deg);
+  transform-origin: top right;
+  z-index: 6;
+}
+
+.abc-badging span {
+  position: relative;  
+  z-index: 2;    
 }

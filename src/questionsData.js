@@ -4,70 +4,80 @@ export const questionData = [{
     "B": "speed up",
     "C": "proceed with caution",
     "D": "honk the horn",
-    "answer": "A"
+    "answer": "A",
+    "questiontype":"0"
   }, {
     "question": "A knish is traditionally stuffed with what filling?",
     "A": "potato",
     "B": "creamed corn",
     "C": "lemon custard",
     "D": "raspberry jelly",
-    "answer": "A"
+    "answer": "A",
+    "questiontype":"0"
   }, {
     "question": "A pita is a type of what?",
     "A": "fresh fruit",
     "B": "flat bread",
     "C": "French tart",
     "D": "friend bean dip",
-    "answer": "B"
+    "answer": "B",
+    "questiontype":"0"
   }, {
     "question": "A portrait that comically exaggerates a person's physical traits is called a what?",
     "A": "landscape",
     "B": "caricature",
     "C": "still life",
     "D": "Impressionism",
-    "answer": "B"
+    "answer": "B",
+    "questiontype":"1"
   }, {
     "question": "A second-year college student is usually called a what?",
     "A": "sophomore",
     "B": "senior",
     "C": "freshman ",
     "D": "junior ",
-    "answer": "A"
+    "answer": "A",
+    "questiontype":"2"
   }, {
     "question": "A student who earns a J.D. can begin his or her career as a what?",
     "A": "lawyer",
     "B": "bricklayer",
     "C": "doctor",
     "D": "accountant",
-    "answer": "A"
+    "answer": "A",
+    "questiontype":"0"
   }, {
     "question": "A triptych is a work of art that is painted on how many panels?",
     "A": "two",
     "B": "three",
     "C": "five",
     "D": "eight",
-    "answer": "B"
+    "answer": "B",
+    "questiontype":"3"
   }, {
     "question": "According to a famous line from the existentialist play 'No Exit' what is hell?",
     "A": "oneself",
     "B": "other people",
     "C": "little made large",
     "D": "hued in green and blue",
-    "answer": "B"
+    "answer": "B",
+    "questiontype":"3"
   }, {
     "question": "According to a popular slogan, what state should people not 'mess with'?",
     "A": "New York",
     "B": "Texas",
     "C": "Montana",
     "D": "Rhode Island",
-    "answer": "B"
+    "answer": "B",
+    "questiontype":"3"
   }, {
     "question": "According to a Yale University study, what smell is the most recognizable to American adults?",
     "A": "tuna",
     "B": "laundry",
     "C": "popcorn",
     "D": "coffee",
-    "answer": "D"
+    "answer": "D",
+    "questiontype":"3"
   }, {
     "question": "According to folklore, the 'jackalope' is an antlered version of what animal?",
     "A": "chicken",
