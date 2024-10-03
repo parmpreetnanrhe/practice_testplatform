@@ -1,16 +1,24 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Button } from './Button'
 import SelectComponent from './SelectComponent';
-import { QuestionDataContext } from '../contexts/QuestionDataContext';
+import { PracticeQuesPallet } from '../contexts/PracticeQuesPalletContext';
 
 export default function Pallet({ pallteclickdOnQuestion, currentQuestionIndex }) {
   const [isPalletOpen, setIsPalletOpen] = useState(false);
-  const getQuestionDataContext = useContext(QuestionDataContext);
- 
+  const [categoryNamesArray, setCategoryNamesArray] = useState([]);
+  const [questionsData, setQuestionData] = useState({});
+  const palletData = useContext(PracticeQuesPallet);
+
   const togglePanel = () => {
     setIsPalletOpen(!isPalletOpen);
   };
+  useEffect(() => {
+    setQuestionData(palletData.questionsData);
+    setCategoryNamesArray(palletData.categoryNamesArray);
+    console.log(questionsData)
+    console.log(categoryNamesArray)
 
+  }, [palletData])
 
   return (
     <>
@@ -42,11 +50,11 @@ export default function Pallet({ pallteclickdOnQuestion, currentQuestionIndex })
           />
         </div>
         <div className='question-box-container'>
-          {getQuestionDataContext.questionDatainfo.length > 0 && (
-            getQuestionDataContext.questionDatainfo.map((qid, index) => (
-              <div  key={index} 
-              className={`ques-box ${index === currentQuestionIndex ? "quesActive" : ""}`} 
-              onClick={() => pallteclickdOnQuestion(index)}><span>{index + 1}</span></div>
+          {questionsData.length > 0 && (
+            questionsData.map((queData, index) => (
+              <div key={queData.questionId}
+                className={`ques-box ${queData.questionNo == currentQuestionIndex ? "quesActive" : ""}`}
+                onClick={() => pallteclickdOnQuestion(queData.questionNo)}><span>{queData.questionNo}</span></div>
             )
               // <div qid="1" className='ques-box'><span>1</span></div>
             ))}

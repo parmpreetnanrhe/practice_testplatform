@@ -10,18 +10,16 @@ import TestInfoContextProvider from './contexts/TestInfoContext';
 import TestStartTimer from './components/TestStartTimer';
 import Pallet from './components/Pallet';
 import QuestionDataContext from './contexts/QuestionDataContext';
-
+import { PracticeQuePalletApiGeneric } from './apis/PracticeQuePalletApiGeneric';
+import { PracticeQuesPalletContextProvider } from './contexts/PracticeQuesPalletContext';
 
 function App() {
   return (
-    <UserInfoContextProvider>
-      <TestInfoContextProvider>
-        <QuestionDataContext>
-          <MainHeader />
-          <TestStartTimer />
-          {/* <Footer /> */}
-        </QuestionDataContext>
-      </TestInfoContextProvider>
+    <UserInfoContextProvider> 
+      <MainHeader />
+      <PracticeQuesPalletContextProvider>
+        {/* <Footer /> */}
+      </PracticeQuesPalletContextProvider>
     </UserInfoContextProvider>
 
   );

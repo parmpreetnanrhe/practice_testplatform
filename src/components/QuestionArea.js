@@ -7,6 +7,8 @@ import { UserInfoAuthContext } from '../contexts/UserInfoContext';
 import Pallet from './Pallet';
 import SubHeader from './SubHeader';
 import { Question_heading } from './Question_heading';
+import { QuestionDataContext } from '../contexts/QuestionDataContext';
+
 
 export default function QuestionArea({ testTimeStarts }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -14,6 +16,7 @@ export default function QuestionArea({ testTimeStarts }) {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const checkUserAuth = useContext(UserInfoAuthContext);
+  const getQuestionDataContext = useContext(QuestionDataContext);
 
 
   const handleNextClick = () => {
@@ -44,26 +47,17 @@ export default function QuestionArea({ testTimeStarts }) {
   };
 
   useEffect(() => {
-    checkUserAuth.isUserLogin();
-    if (checkUserAuth.userInfo == true) {
-      fetch("https://api.github.com/users")
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data);
-        });
-    } else {
-      // alert("userLogout");
-    }
+     
   }, [checkUserAuth.userInfo]);
 
   return (
     <>
       <SubHeader 
       testTimeStarts={testTimeStarts}
-      currentQuestionCount={currentQuestionIndex + 1} />
+      currentQuestionCount={currentQuestionIndex} />
       <div className="question-main-container">
         <div className='question-container'>
-        <Question_heading  currentQuestionCount={currentQuestionIndex + 1}/>
+        <Question_heading  currentQuestionCount={currentQuestionIndex}/>
         <form onSubmit={handleSubmit}>
           {questionData.length > 0 && (
             <div className="single-question">
