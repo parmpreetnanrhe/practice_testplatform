@@ -69,19 +69,22 @@ export default function QuestionArea({ testTimeStarts }) {
             <div className="single-question">
               <h3>{questionData[currentQuestionIndex].question}</h3>
               {['A', 'B', 'C', 'D'].map((option) => (
-                <div key={option}>
-                  <Input
-                    type="radio"
-                    id={`${currentQuestionIndex}-${option}`}
-                    name={`${currentQuestionIndex}`}
-                    // Here we can manage checkbox states as needed
-                    checked={selectedAnswers[currentQuestionIndex] === option}
-                    onChange={() => handleCheckboxChange(option)}
-                  />
-                  <label htmlFor={`${currentQuestionIndex}-${option}`}>
-                    {`${option}: ${questionData[currentQuestionIndex][option]}`}
-                  </label>
-                </div>
+                <label className="quesOpt" htmlFor={`${currentQuestionIndex}-${option}`} key={option}>
+                  <div className='perseusInteractive'>
+                    <Input
+                      type="radio"
+                      id={`${currentQuestionIndex}-${option}`}
+                      name={`${currentQuestionIndex}`}
+                      // Here we can manage checkbox states as needed
+                      checked={selectedAnswers[currentQuestionIndex] === option}
+                      onChange={() => handleCheckboxChange(option)}
+                    />
+                    <span className='iconWrapper'>{option}</span>
+                  </div>
+                  <span className='optionTxt'>
+                    {`${questionData[currentQuestionIndex][option]}`}
+                  </span>
+                </label>
               ))}
             </div>
           )}
