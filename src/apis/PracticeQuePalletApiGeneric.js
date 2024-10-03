@@ -12,16 +12,16 @@ export const PracticeQuePalletApiGeneric = ({ setPalletQueData }) => {
     platform: "android",
     app_flag: 11,
     app_type: "mycoach",
-    client_id: 2095,
+    client_id: 5480,
     version: 93,
     device_id: "587831233a4827f7",
     device_details: "MANUFACTURER=samsung MODEL=SM-E225F RELEASE=13 SDK=TIRAMISUDevice Id TP1A.220624.014",
     user_type: 0,
-    user_idd: 6185167,
-    user_id: 6185167,
-    beta_idd: 6185167,
-    beta_id: 6185167,
-    cms_id: 6185167,
+    user_idd: 496956,
+    user_id: 496956,
+    beta_idd: 496956,
+    beta_id: 496956,
+    cms_id: 496956,
   };
 
 
@@ -50,4 +50,6 @@ export const PracticeQuePalletApiGeneric = ({ setPalletQueData }) => {
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>; 
+
+
 }

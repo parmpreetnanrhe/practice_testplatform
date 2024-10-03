@@ -109,6 +109,7 @@ body {
   transition: right 0.3s ease;
   padding: 1rem;
   overflow: auto;
+  z-index: 9;
 }
 
 .side-panel.open {

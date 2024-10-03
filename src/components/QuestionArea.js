@@ -1,8 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { questionData } from '../questionsData';
+// import { questionsDataLoaded } from '../questionsData';
 import Input from './Input';
 import { Footer } from './Footer';
-import { Button } from './Button';
 import { UserInfoAuthContext } from '../contexts/UserInfoContext';
 import Pallet from './Pallet';
 import SubHeader from './SubHeader';
@@ -10,17 +9,17 @@ import { Question_heading } from './Question_heading';
 import { QuestionDataContext } from '../contexts/QuestionDataContext';
 
 
-export default function QuestionArea({ testTimeStarts }) {
+export default function QuestionArea({ questionsDataLoaded }) { 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState({}); // Store user Answer Selection
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [loadQuestionSts,setLadQuestionSts] = useState(false);
 
   const checkUserAuth = useContext(UserInfoAuthContext);
-  const getQuestionDataContext = useContext(QuestionDataContext);
-
+  const getQuestionDataContext = useContext(QuestionDataContext); 
 
   const handleNextClick = () => {
-    setCurrentQuestionIndex((prevIndex) => Math.min(prevIndex + 1, questionData.length - 1));
+    setCurrentQuestionIndex((prevIndex) => Math.min(prevIndex + 1, questionsDataLoaded.length - 1));
   };
 
   const handlePreviousClick = () => {
@@ -45,53 +44,60 @@ export default function QuestionArea({ testTimeStarts }) {
     console.log('Selected Answers: ', selectedAnswers);
     alert('Test Submitted!');
   };
-
+ 
   useEffect(() => {
-     
-  }, [checkUserAuth.userInfo]);
+    let encodedString = questionsDataLoaded.testData.sectionsData;
 
+    console.log(encodedString);
+    // const decoded = atob(encodedString); 
+  }, [questionsDataLoaded]);  
+ 
   return (
     <>
-      <SubHeader 
-      testTimeStarts={testTimeStarts}
-      currentQuestionCount={currentQuestionIndex} />
+    {/* {loadQuestionSts && (
+      <SubHeader
+        testTimeStarts={testTimeStarts}
+        currentQuestionCount={currentQues tionIndex} />
+        )} */}
+      {/* <Pallet pallteclickdOnQuestion={pallteclickdOnQuestion}
+        currentQuestionIndex={currentQuestionIndex} /> */}
       <div className="question-main-container">
+      {questionsDataLoaded && (
         <div className='question-container'>
-        <Question_heading  currentQuestionCount={currentQuestionIndex}/>
-        <form onSubmit={handleSubmit}>
-          {questionData.length > 0 && (
-            <div className="single-question">
-              <h3>{questionData[currentQuestionIndex].question}</h3>
-              {['A', 'B', 'C', 'D'].map((option) => (
-                <div key={option}>
-                  <Input
-                    type="radio"
-                    id={`${currentQuestionIndex}-${option}`}
-                    name={`${currentQuestionIndex}`}
-                    // Here we can manage checkbox states as needed
-                    checked={selectedAnswers[currentQuestionIndex] === option}
-                    onChange={() => handleCheckboxChange(option)}
-                  />
-                  <label htmlFor={`${currentQuestionIndex}-${option}`}>
-                    {`${option}: ${questionData[currentQuestionIndex][option]}`}
-                  </label>
-                </div>
-              ))}
-            </div>
-          )}
-        </form>
+          <Question_heading currentQuestionCount={currentQuestionIndex} />
+          <form onSubmit={handleSubmit}>
+            {questionsDataLoaded.length > 0 && (
+              <div className="single-question">
+                <h3>{questionsDataLoaded[currentQuestionIndex].question}</h3>
+                {['A', 'B', 'C', 'D'].map((option) => (
+                  <div key={option}>
+                    <Input
+                      type="radio"
+                      id={`${currentQuestionIndex}-${option}`}
+                      name={`${currentQuestionIndex}`}
+                      // Here we can manage checkbox states as needed
+                      checked={selectedAnswers[currentQuestionIndex] === option}
+                      onChange={() => handleCheckboxChange(option)}
+                    />
+                    <label htmlFor={`${currentQuestionIndex}-${option}`}>
+                      {`${option}: ${questionsDataLoaded[currentQuestionIndex][option]}`}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            )}
+          </form>
         </div>
+      )}
       </div>
       <div>
         <Footer
           onPrevious={handlePreviousClick}
           onNext={handleNextClick}
           currentQuestionIndex={currentQuestionIndex}
-          totalQuestions={questionData.length}
+          // totalQuestions={questionsDataLoaded.length}
         />
       </div>
-      <Pallet pallteclickdOnQuestion={pallteclickdOnQuestion}
-      currentQuestionIndex={currentQuestionIndex} />
     </>
   );
 }
