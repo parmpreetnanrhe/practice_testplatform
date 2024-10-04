@@ -34,12 +34,12 @@ export default function Pallet({ }) {
   const handleQuestionClick = async (platformLink, questionNo) => {
     setIsPalletOpen(false); 
     setQuestionAreaVisible(false);
+    setShowScreenLoader(false); 
     await FetchQuestionDataApi(platformLink, questionNo)
       .then(data => {
         setQuestionsDataLoaded(data);
         setCurrentQuestionNo(questionNo);
-        setQuestionAreaVisible(true);  
-        setShowScreenLoader(false);
+        setQuestionAreaVisible(true);   
       }).catch(error => console.error('Error fetching question data:', error));
   }
 

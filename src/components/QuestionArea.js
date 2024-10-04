@@ -75,7 +75,7 @@ export default function QuestionArea({ questionAreaProps }) {
   return (
     <>
       <div className="question-main-container">
-        {questionsDataLoaded && (
+        {questionText && (
           <div className={`question-container ${!questionAreaVisible ? 'loading' : ""} `}>
             <Question_heading currentQuestionCount={currentQuestionNo + 1} />
             <form onSubmit={handleSubmit}>
@@ -96,7 +96,7 @@ export default function QuestionArea({ questionAreaProps }) {
                         <span className='iconWrapper'>{decryptPassword(atob(option))}</span>
                       </div>
                       <span className='optionTxt'>
-                        {/* {`${questionData[currentQuestionIndex][option]}`} */}
+                        {decryptPassword(atob(option))}
                       </span>
                     </label>
                   ))}
