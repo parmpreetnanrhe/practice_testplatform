@@ -74,9 +74,9 @@ export default function QuestionArea({ questionAreaProps }) {
         )} */}
       {/* <Pallet pallteclickdOnQuestion={pallteclickdOnQuestion}
         currentQuestionIndex={currentQuestionIndex} /> */}
-      <div className="question-main-container">
+      <div className="question-main-container ">
         {questionsDataLoaded && (
-          <div className='question-container'>
+          <div className='question-container loading'>
             <Question_heading currentQuestionCount={currentQuestionNo + 1} />
             <form onSubmit={handleSubmit}>
               {questionText && (

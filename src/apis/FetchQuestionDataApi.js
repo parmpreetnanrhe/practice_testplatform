@@ -3,7 +3,7 @@ import axios from 'axios';
 export const FetchQuestionDataApi = async (payLoads) => {
   const payload = {
     dev: 10,
-    platform: "android",
+    platform: "android", 
     app_flag: 11,
     app_type: "mycoach",
     client_id: 5480,

@@ -7,13 +7,13 @@ import { FetchQuestionDataApi } from '../apis/FetchQuestionDataApi';
 import FullScreenLoader from './modalComponent/FullScreenLoader';
 
 export default function Pallet({ }) {
-  const [questionsDataLoaded, setQuestionsDataLoaded] = useState([]);
-  const [questionAreaVisible, setQuestionAreaVisible] = useState(false);
-  const [currentQuestionNo, setCurrentQuestionNo] = useState(0);
-  const [isPalletOpen, setIsPalletOpen] = useState(true);
+  const [questionsDataLoaded, setQuestionsDataLoaded] = useState([]); 
+  const [currentQuestionNo, setCurrentQuestionNo] = useState(0); 
   const [categoryNamesArray, setCategoryNamesArray] = useState([]);
   const [palletQuestionBoxData, setPalletQuestionBoxData] = useState([]);
+  const [questionAreaVisible, setQuestionAreaVisible] = useState(false);
   const [showScreenLoader, setShowScreenLoader] = useState(true)
+  const [isPalletOpen, setIsPalletOpen] = useState(true);
 
   // pallet data coming from context
   const palletData = useContext(PracticeQuesPallet);
@@ -59,7 +59,7 @@ export default function Pallet({ }) {
   }, [pQuesData])
 
 
-  return (
+  return ( 
     <>
       {(questionAreaVisible) &&
         <QuestionArea questionAreaProps={{ questionsDataLoaded, currentQuestionNo, handleQuestionClick, palletQuestionBoxData }} />
