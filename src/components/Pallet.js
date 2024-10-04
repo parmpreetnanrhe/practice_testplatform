@@ -59,7 +59,7 @@ export default function Pallet({ }) {
   }, [pQuesData])
 
 
-  return (
+  return ( 
     <>
       {(questionAreaVisible) &&
         <QuestionArea questionAreaProps={{ questionsDataLoaded, currentQuestionNo, handleQuestionClick, palletQuestionBoxData }} />
