@@ -55,7 +55,6 @@ export default function Pallet({ }) {
         label: data.name,
       }));
       setCategoryNamesArray(categories);
-      setShowScreenLoader(false);
     }
   }, [pQuesData])
 
@@ -65,7 +64,7 @@ export default function Pallet({ }) {
       {(questionAreaVisible) &&
         <QuestionArea questionAreaProps={{ questionsDataLoaded, currentQuestionNo, handleQuestionClick, palletQuestionBoxData }} />
       }
-      {showScreenLoader && <FullScreenLoader text="Please wait while we are loading..." />}
+      {showScreenLoader && <FullScreenLoader text={questionAreaVisible ? "Please wait while we are loading..." : ""} />}
 
       <div className={`pallet-button ${isPalletOpen ? 'pallet-button-move' : ''}`}>
         <Button
