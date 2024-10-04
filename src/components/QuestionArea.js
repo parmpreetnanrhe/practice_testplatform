@@ -68,6 +68,17 @@ export default function QuestionArea({ questionAreaProps }) {
     alert('Test Submitted!');
   };
 
+  const handleCheckboxChange = (option) => {
+    setSelectedAnswers((prevState) => ({
+      ...prevState,
+      [currentQuestionNo]: option,
+    }));
+  };
+
+  const convertToLetter = (num) => {
+    return String.fromCharCode(64 + num); // 'A' starts at 65 in ASCII
+  };
+
 
 
 
@@ -83,17 +94,18 @@ export default function QuestionArea({ questionAreaProps }) {
                 <div className="single-question">
                   <h3>{questionText}</h3>
                   {questionsOptionsArr[0].map((option,index) => (
-                    <label className="quesOpt" htmlFor={`${index}-${currentQuestionNo}`} key={option}>
+                    <label className="quesOpt" htmlFor={`${index+1}-${currentQuestionNo}`} key={option}>
                       <div className='perseusInteractive'>
                         <Input
                           type="radio"
-                          id={`${index}-${currentQuestionNo}`}
-                          name={`${index}`}
+                          id={`${index+1}-${currentQuestionNo}`}
+                          name={`${currentQuestionNo}`}
                           // Here we can manage checkbox states as needed
-                          checked={selectedAnswers[index] === currentQuestionNo}
-                          onChange={() => ''}
+                          value={index+1}
+                          checked={selectedAnswers[currentQuestionNo] === index+1}
+                          onChange={() => handleCheckboxChange(index+1)}
                         />
-                        <span className='iconWrapper'>{decryptPassword(atob(option))}</span>
+                        <span className='iconWrapper'>{convertToLetter(index+1)}</span>
                       </div>
                       <span className='optionTxt'>
                         {decryptPassword(atob(option))}
