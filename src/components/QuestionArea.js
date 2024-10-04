@@ -82,7 +82,7 @@ export default function QuestionArea({ questionAreaProps }) {
               {questionText && (
                 <div className="single-question">
                   <h3>{questionText}</h3>
-                  {/* {['A', 'B', 'C', 'D'].map((option) => (
+                   {['A', 'B', 'C', 'D'].map((option) => (
                     <div key={option}>
                       <Input
                         type="radio"
@@ -96,7 +96,7 @@ export default function QuestionArea({ questionAreaProps }) {
                         {`${option}: ${questionsDataLoaded[currentQuestionIndex][option]}`}
                       </label>
                     </div>
-                  ))} */}
+                  ))} 
                 </div>
               )}
             </form>
