@@ -2,16 +2,23 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Button } from './Button'
 import SelectComponent from './SelectComponent';
 import { PracticeQuesPallet } from '../contexts/PracticeQuesPalletContext';
-import axios from 'axios';
 import QuestionArea from './QuestionArea';
+import { FetchQuestionDataApi } from '../apis/FetchQuestionDataApi';
+import FullScreenLoader from './modalComponent/FullScreenLoader';
 
-export default function Pallet({ pallteclickdOnQuestion, currentQuestionIndex }) {
+export default function Pallet({ }) {
+  const [questionsDataLoaded, setQuestionsDataLoaded] = useState([]);
+  const [questionAreaVisible, setQuestionAreaVisible] = useState(false);
+  const [currentQuestionNo, setCurrentQuestionNo] = useState(0);
   const [isPalletOpen, setIsPalletOpen] = useState(true);
   const [categoryNamesArray, setCategoryNamesArray] = useState([]);
-  const [questionsData, setQuestionData] = useState([]);
-  const [questionsDataLoaded, setquestionsDataLoaded] = useState([]);
+  const [palletQuestionBoxData, setPalletQuestionBoxData] = useState([]);
+  const [showScreenLoader, setShowScreenLoader] = useState(true) 
+
+  // pallet data coming from context
   const palletData = useContext(PracticeQuesPallet);
-  const [isNewComponentVisible, setIsNewComponentVisible] = useState(false);
+  const pQuesData = palletData.palletQueData;
+
 
   const optionsArray = ['All', 'Correct', 'Incorrect', 'Un-attempted', 'Flagged'];
   const options2 = optionsArray.map((option, index) => ({
@@ -22,11 +29,27 @@ export default function Pallet({ pallteclickdOnQuestion, currentQuestionIndex })
   const togglePanel = () => {
     setIsPalletOpen(!isPalletOpen);
   };
-  useEffect(() => {
-    setQuestionData(palletData.questionsData);
 
-    if (palletData && palletData.categoryNamesArray) {
-      const categoriesWithSubCats = palletData.categoryNamesArray.filter(category =>
+  // Fetch question data when a question-box is clicked
+  const handleQuestionClick = async (platformLink, questionNo) => {
+    setIsPalletOpen(false);
+    setShowScreenLoader(true);
+    setQuestionAreaVisible(false);
+    await FetchQuestionDataApi(platformLink, questionNo)
+      .then(data => {
+        setQuestionsDataLoaded(data); 
+        setCurrentQuestionNo(questionNo); 
+        // console.log("currentQuestionNo"+currentQuestionNo);
+        setQuestionAreaVisible(true);
+        setShowScreenLoader(false);
+      }).catch(error => console.error('Error fetching question data:', error));
+  }
+
+  useEffect(() => {
+    setPalletQuestionBoxData(pQuesData.questionsData);
+    // console.log(pQuesData.questionsData);
+    if (pQuesData && pQuesData.categoryNamesArray) {
+      const categoriesWithSubCats = pQuesData.categoryNamesArray.filter(category =>
         category.subCats && category.subCats.length > 0
       );
       const categories = categoriesWithSubCats.map((data) => ({
@@ -34,61 +57,18 @@ export default function Pallet({ pallteclickdOnQuestion, currentQuestionIndex })
         label: data.name,
       }));
       setCategoryNamesArray(categories);
+      setShowScreenLoader(false);
     }
-  }, [palletData])
+  }, [pQuesData])
 
 
-
-
-  const payload = {
-    // payLoads: "YGZqe0doNDw8Izk9MCFienxwYFFoc3B1enVrPD8kOCMkMD97a399R3ZHc2lmc3xxcEdtYX06JDRhYmF1WnVjdnpKfTI7Ojg+NiUyOCNyZndnWmwvPT4jKyAxNHJhZnx6emRNdn5pNGpgZGJta2N8fHI1bntlc3BgQX5iZDN1ZH8yb3h8el18a3ZjaGdrSXovJCIuY3xiZmZ8aHxCb2BtdHtxYDI/PDk+NSQneXBiZmZ8fGZcZjokNGRyd3J6fWd9WmxNYF1kZnk4Jid5cGJmZnx8ZlttOi0mIzQhOQ==",
-    dev: 10,
-    platform: "android",
-    app_flag: 11,
-    app_type: "mycoach",
-    client_id: 5480,
-    version: 93,
-    device_id: "587831233a4827f7",
-    device_details: "MANUFACTURER=samsung MODEL=SM-E225F RELEASE=13 SDK=TIRAMISUDevice Id TP1A.220624.014",
-    user_type: 0,
-    user_idd: 496956,
-    user_id: 496956,
-    beta_idd: 496956,
-    beta_id: 496956,
-    cms_id: 496956
-  };
-
-
-
-  const fetchData = async (payLoads) => {
-    payload.payLoads = payLoads;
-    try {
-      const response = await axios.post(
-        'app/api/practiceQueDataFetchApiGeneric.php',
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json", "Access-Control-Allow-Origin": "*",
-          },
-        }
-      );
-      setquestionsDataLoaded(response.data);
-      setIsNewComponentVisible(true);
-      togglePanel();
-    } catch (err) {
-      // setError(err.message);
-    } finally {
-      // setLoading(false);
-    }
-  };
-
-
- 
   return (
     <>
-     {(isNewComponentVisible)  && 
-      <QuestionArea questionsDataLoaded={questionsDataLoaded} />
-    }
+      {(questionAreaVisible) &&
+        <QuestionArea questionAreaProps={{ questionsDataLoaded, currentQuestionNo, handleQuestionClick ,palletQuestionBoxData}} />
+      }
+      {showScreenLoader && <FullScreenLoader text="Please wait while we are loading..." />}
+
       <div className={`pallet-button ${isPalletOpen ? 'pallet-button-move' : ''}`}>
         <Button
           type="button"
@@ -117,14 +97,13 @@ export default function Pallet({ pallteclickdOnQuestion, currentQuestionIndex })
           />
         </div>
         <div className='question-box-container'>
-          {questionsData && questionsData.length > 0 && (
-            questionsData.map((queData, index) => (
+          {palletQuestionBoxData && palletQuestionBoxData.length > 0 && (
+            palletQuestionBoxData.map((queData, index) => (
               <div key={queData.questionId}
-                className={`ques-box ${queData.questionNo == currentQuestionIndex ? "quesActive" : ""}`}
-                onClick={() => fetchData(queData.platformLink)}><span>{queData.questionNo}</span></div>
+                className={`ques-box ${(queData.questionNo - 1) == currentQuestionNo ? "quesBoxDisabled" : ""}`}
+                onClick={() => handleQuestionClick(queData.platformLink, (queData.questionNo - 1))}><span>{queData.questionNo} {queData.questionId}</span></div>
             )
             ))}
-
         </div>
       </div>
     </>

@@ -84,6 +84,7 @@ body {
   border-radius: 5px;
   cursor: pointer;
   transition: right 0.3s ease;
+  z-index: 3;
 }
 
 .pallet-button button {
@@ -458,4 +459,33 @@ span.iconWrapper {
 .perseusInteractive input:checked ~ .iconWrapper {
   background: #0277c8;
   color: #FFFFFF;
+}
+
+.quesBoxDisabled {
+  background-color: #f0f0f0;  /* Light gray background */
+  color: #a9a9a9;             /* Gray text */
+  cursor: not-allowed;        /* Change cursor to indicate it is disabled */
+  pointer-events: none;       /* Disable all interactions */
+  opacity: 0.6;               /* Reduce opacity */
+  border: 1px solid #d3d3d3;  /* Add a subtle border */
+  position: relative;         /* Required for positioning the icon */
+}
+
+/* Add an icon on hover */
+.quesBoxDisabled::after {
+  content: '\f05e';           /* FontAwesome exclamation-circle icon (example) */
+  font-family: 'FontAwesome';
+  font-size: 20px;            /* Adjust icon size */
+  color: #a9a9a9;             /* Gray color for the icon */
+  position: absolute;
+  top: 50%;
+  right: 10px;                /* Position it within the box */
+  transform: translateY(-50%);
+  opacity: 0;                 /* Initially hidden */
+  transition: opacity 0.3s ease;
+}
+
+/* Show the icon on hover */
+.quesBoxDisabled:hover::after {
+  opacity: 1;                 /* Show icon on hover */
 }
