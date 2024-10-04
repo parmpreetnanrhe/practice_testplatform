@@ -5,9 +5,7 @@ export default function TestStartTimer() {
     const testInfo = useContext(TestInfoContext);
     const [testTimeSpending, setTestTimeSpending] = useState(0);
     
-    useEffect(() => {
-
-        console.log(setTestTimeSpending);
+    useEffect(() => {  
         const countdown = setInterval(() => {
             setTestTimeSpending(prevTime => prevTime + 1);
         }, 1000);
