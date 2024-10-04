@@ -64,8 +64,9 @@ body {
 }
 
 .single-question {
-  margin: 0.625rem 0; 
-  text-align: center; 
+  margin: 0.625rem 0;
+  display: inline-block;
+  width: 100%;
 }
 
 .single-question label {
@@ -91,6 +92,10 @@ body {
   height: 30px;
   color: white;
   border: 0;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  outline: none;
 }
 
 .pallet-button-move {
@@ -191,7 +196,6 @@ body::-webkit-scrollbar-thumb:hover {
 }
 
 .question-box-container .ques-box {
-  border: 1px solid black;
   height: 2.375rem;
   border-radius: 4px;
   text-align: center;
@@ -200,6 +204,12 @@ body::-webkit-scrollbar-thumb:hover {
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0px 1px 3px 1px rgba(0,0,0,0.20);
+  color: #636060;
+}
+
+.question-box-container .ques-box.quesActive {
+  color: #FFFFFF;
 }
 
 .main-title {
@@ -285,7 +295,6 @@ body::-webkit-scrollbar-thumb:hover {
   padding: 1.25rem;
   overflow: auto;
   display: flex;
-  text-align: center;
   flex-direction: column;
   align-items: center;
 }
@@ -308,6 +317,7 @@ body::-webkit-scrollbar-thumb:hover {
   width: 2rem;
   color: white;  
   border-radius: 5px 0 0 5px;
+  text-align: center;
 }
  
 .abc-badging {
@@ -362,7 +372,7 @@ body::-webkit-scrollbar-thumb:hover {
   border: 1px solid #FFFFFF;
 }
 
-.filterDropdown:after {
+.selectedVal:after {
   position: absolute;
   content: "";
   top: 13px;
@@ -394,4 +404,58 @@ body::-webkit-scrollbar-thumb:hover {
 
 .selectItems .optionItem:last-child {
   background: none;
+}
+
+.quesOpt {
+  display: flex;
+  padding: 1rem;
+  border: solid 1px #ccc;
+  border-radius: 5px;
+  position: relative;
+  transition: opacity 0.2s ease-out !important;
+  cursor: pointer !important;
+  -webkit-transition: opacity 0.2s ease-out !important;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.single-question label:has(input:checked) {
+  box-shadow: 0px 0px 1px 2px #0277c8;
+}
+
+span.optionTxt {
+  font-size: 18px;
+  color: #333;
+  line-height: 24px;
+}
+
+.single-question h3 {
+  font-size: 1.125rem;
+  font-weight: 400;
+  color: #333;
+  line-height: 1.688rem;
+}
+
+.perseusInteractive input {display: none;}
+
+span.iconWrapper {
+  border: 2px solid #333333;
+  width: 1.875rem;
+  height: 1.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: 700;
+  padding-top: 0.063rem;
+}
+
+.perseusInteractive input:checked ~ iconWrapper {
+  background: red;
+}
+
+.perseusInteractive input:checked ~ .iconWrapper {
+  background: #0277c8;
+  color: #FFFFFF;
 }
