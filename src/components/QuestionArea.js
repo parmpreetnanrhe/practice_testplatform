@@ -4,6 +4,7 @@ import { UserInfoAuthContext } from '../contexts/UserInfoContext';
 import { Question_heading } from './Question_heading';
 import { QuestionDataContext } from '../contexts/QuestionDataContext';
 import { decryptPassword } from '../commonFunctions/decryptPassword';
+import Input from './Input';
 
 export default function QuestionArea({ questionAreaProps }) {
   const { questionsDataLoaded, currentQuestionNo, handleQuestionClick, palletQuestionBoxData } = questionAreaProps;
@@ -74,28 +75,31 @@ export default function QuestionArea({ questionAreaProps }) {
         )} */}
       {/* <Pallet pallteclickdOnQuestion={pallteclickdOnQuestion}
         currentQuestionIndex={currentQuestionIndex} /> */}
-      <div className="question-main-container ">
+      <div className="question-main-container">
         {questionsDataLoaded && (
-          <div className='question-container loading'>
+          <div className='question-container'>
             <Question_heading currentQuestionCount={currentQuestionNo + 1} />
             <form onSubmit={handleSubmit}>
               {questionText && (
                 <div className="single-question">
                   <h3>{questionText}</h3>
                    {['A', 'B', 'C', 'D'].map((option) => (
-                    <div key={option}>
+                    <label className="quesOpt" htmlFor={`${currentQuestionIndex}-${option}`} key={option}>
+                    <div className='perseusInteractive'>
                       <Input
                         type="radio"
                         id={`${currentQuestionIndex}-${option}`}
                         name={`${currentQuestionIndex}`}
                         // Here we can manage checkbox states as needed
                         checked={selectedAnswers[currentQuestionIndex] === option}
-                        onChange={() => handleCheckboxChange(option)}
+                        onChange={() => ''}
                       />
-                      <label htmlFor={`${currentQuestionIndex}-${option}`}>
-                        {`${option}: ${questionsDataLoaded[currentQuestionIndex][option]}`}
-                      </label>
+                      <span className='iconWrapper'>{option}</span>
                     </div>
+                    <span className='optionTxt'>
+                      {/* {`${questionData[currentQuestionIndex][option]}`} */}
+                    </span>
+                  </label>
                   ))} 
                 </div>
               )}
@@ -108,7 +112,7 @@ export default function QuestionArea({ questionAreaProps }) {
           onPrevious={handlePreviousClick}
           onNext={handleNextClick}
           currentQuestionIndex={currentQuestionIndex}
-          totalQuestions={questionData.length} 
+          // totalQuestions={questionData.length} 
         // totalQuestions={questionsDataLoaded.length}
         />
       </div>
