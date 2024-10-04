@@ -96,7 +96,7 @@ export default function QuestionArea({ testTimeStarts }) {
           onPrevious={handlePreviousClick}
           onNext={handleNextClick}
           currentQuestionIndex={currentQuestionIndex}
-          totalQuestions={questionData.length}
+          totalQuestions={questionData.length} 
         />
       </div>
       <Pallet pallteclickdOnQuestion={pallteclickdOnQuestion}
