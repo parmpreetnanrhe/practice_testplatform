@@ -13,7 +13,7 @@ export default function Pallet({ }) {
   const [isPalletOpen, setIsPalletOpen] = useState(true);
   const [categoryNamesArray, setCategoryNamesArray] = useState([]);
   const [palletQuestionBoxData, setPalletQuestionBoxData] = useState([]);
-  const [showScreenLoader, setShowScreenLoader] = useState(true) 
+  const [showScreenLoader, setShowScreenLoader] = useState(true)
 
   // pallet data coming from context
   const palletData = useContext(PracticeQuesPallet);
@@ -37,9 +37,8 @@ export default function Pallet({ }) {
     setQuestionAreaVisible(false);
     await FetchQuestionDataApi(platformLink, questionNo)
       .then(data => {
-        setQuestionsDataLoaded(data); 
-        setCurrentQuestionNo(questionNo); 
-        // console.log("currentQuestionNo"+currentQuestionNo);
+        setQuestionsDataLoaded(data);
+        setCurrentQuestionNo(questionNo);
         setQuestionAreaVisible(true);
         setShowScreenLoader(false);
       }).catch(error => console.error('Error fetching question data:', error));
@@ -47,7 +46,6 @@ export default function Pallet({ }) {
 
   useEffect(() => {
     setPalletQuestionBoxData(pQuesData.questionsData);
-    // console.log(pQuesData.questionsData);
     if (pQuesData && pQuesData.categoryNamesArray) {
       const categoriesWithSubCats = pQuesData.categoryNamesArray.filter(category =>
         category.subCats && category.subCats.length > 0
@@ -65,7 +63,7 @@ export default function Pallet({ }) {
   return (
     <>
       {(questionAreaVisible) &&
-        <QuestionArea questionAreaProps={{ questionsDataLoaded, currentQuestionNo, handleQuestionClick ,palletQuestionBoxData}} />
+        <QuestionArea questionAreaProps={{ questionsDataLoaded, currentQuestionNo, handleQuestionClick, palletQuestionBoxData }} />
       }
       {showScreenLoader && <FullScreenLoader text="Please wait while we are loading..." />}
 
@@ -100,8 +98,8 @@ export default function Pallet({ }) {
           {palletQuestionBoxData && palletQuestionBoxData.length > 0 && (
             palletQuestionBoxData.map((queData, index) => (
               <div key={queData.questionId}
-                className={`ques-box ${(queData.questionNo - 1) == currentQuestionNo ? "quesBoxDisabled" : ""}`}
-                onClick={() => handleQuestionClick(queData.platformLink, (queData.questionNo - 1))}><span>{queData.questionNo} {queData.questionId}</span></div>
+                className={`ques-box ${((queData.questionNo - 1) == currentQuestionNo && questionAreaVisible) ? "quesBoxDisabled" : ""}`}
+                onClick={() => handleQuestionClick(queData.platformLink, (queData.questionNo - 1))}><span>{queData.questionNo}</span></div>
             )
             ))}
         </div>
