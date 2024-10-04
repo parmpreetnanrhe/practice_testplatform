@@ -32,14 +32,13 @@ export default function Pallet({ }) {
 
   // Fetch question data when a question-box is clicked
   const handleQuestionClick = async (platformLink, questionNo) => {
-    setIsPalletOpen(false);
-    setShowScreenLoader(true);
+    setIsPalletOpen(false); 
     setQuestionAreaVisible(false);
     await FetchQuestionDataApi(platformLink, questionNo)
       .then(data => {
         setQuestionsDataLoaded(data);
         setCurrentQuestionNo(questionNo);
-        setQuestionAreaVisible(true);
+        setQuestionAreaVisible(true);  
         setShowScreenLoader(false);
       }).catch(error => console.error('Error fetching question data:', error));
   }
@@ -61,10 +60,10 @@ export default function Pallet({ }) {
 
   return ( 
     <>
-      {(questionAreaVisible) &&
-        <QuestionArea questionAreaProps={{ questionsDataLoaded, currentQuestionNo, handleQuestionClick, palletQuestionBoxData }} />
-      }
-      {showScreenLoader && <FullScreenLoader text={questionAreaVisible ? "Please wait while we are loading..." : ""} />}
+      
+      <QuestionArea questionAreaProps={{ questionsDataLoaded, currentQuestionNo, handleQuestionClick, palletQuestionBoxData,questionAreaVisible }} />
+    
+      {(showScreenLoader) &&  <FullScreenLoader text={questionAreaVisible ? "Please wait while we are loading..." : ""} />}
 
       <div className={`pallet-button ${isPalletOpen ? 'pallet-button-move' : ''}`}>
         <Button

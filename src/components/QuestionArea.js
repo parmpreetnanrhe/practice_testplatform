@@ -7,7 +7,7 @@ import { decryptPassword } from '../commonFunctions/decryptPassword';
 import Input from './Input';
 
 export default function QuestionArea({ questionAreaProps }) {
-  const { questionsDataLoaded, currentQuestionNo, handleQuestionClick, palletQuestionBoxData } = questionAreaProps;
+  const { questionsDataLoaded, currentQuestionNo, handleQuestionClick, palletQuestionBoxData, questionAreaVisible } = questionAreaProps;
   // console.log(currentQuestionNo);
 
   const currentQuestionIndex = useRef(currentQuestionNo); // useRef, it persists the value across renders without causing a re-render.it will not trigger a re-render when updated.
@@ -17,16 +17,17 @@ export default function QuestionArea({ questionAreaProps }) {
   const [loadQuestionSts, setLadQuestionSts] = useState(false);
   const [questionText, setQuestionText] = useState();
   const [currentQuesData, setCurrentQuesData] = useState();
- 
+  const [questionsOptionsArr, setquestionsOptionsArr] = useState([]);
 
-  const handleNextClick = () => { 
+
+  const handleNextClick = () => {
     if (currentQuestionIndex.current < palletQuestionBoxData.length - 1) {
       currentQuestionIndex.current += 1;
       updateQuestionData(currentQuestionIndex.current);
     }
   };
-  
-  const handlePreviousClick = () => { 
+
+  const handlePreviousClick = () => {
     if (currentQuestionIndex.current > 0) {
       currentQuestionIndex.current -= 1;
       updateQuestionData(currentQuestionIndex.current);
@@ -36,20 +37,25 @@ export default function QuestionArea({ questionAreaProps }) {
   const updateQuestionData = (currentQuestionIndexVal) => {
     const dataLoaded = palletQuestionBoxData[currentQuestionIndexVal];
     setCurrentQuesData(dataLoaded);
+    console.log(questionsDataLoaded)
     console.log(currentQuestionIndex.current)
     console.log(dataLoaded.questionId)
     handleQuestionClick(dataLoaded.platformLink, currentQuestionIndexVal);
   }
 
-  // useEffect(() => { 
 
   useEffect(() => {
-    let encodedString = questionsDataLoaded.testData.sectionsData;
-    let base64EncodedText = encodedString[0].questions[0].questionText;
-    let decodedQuestionText = decryptPassword(atob(base64EncodedText));
-    console.log(encodedString[0].questions[0].questionId)
-
-    setQuestionText(decodedQuestionText);
+    if (questionsDataLoaded && questionsDataLoaded.testData && questionsDataLoaded.testData.sectionsData) {
+      let encodedString = questionsDataLoaded.testData.sectionsData;
+      let quesArray = encodedString[0].questions[0];
+      let base64EncodedText = quesArray.questionText;
+      let questionsOptionsArr = quesArray.questionsOptions;
+      let decodedQuestionText = decryptPassword(atob(base64EncodedText));
+      console.log(encodedString[0].questions[0].questionId);
+      setQuestionText(decodedQuestionText);
+      setquestionsOptionsArr(questionsOptionsArr); 
+      console.log(questionsOptionsArr)
+    }
   }, [questionsDataLoaded]);
 
 
@@ -68,39 +74,32 @@ export default function QuestionArea({ questionAreaProps }) {
 
   return (
     <>
-      {/* {loadQuestionSts && (
-      <SubHeader
-        testTimeStarts={testTimeStarts}
-        currentQuestionCount={currentQues tionIndex} />
-        )} */}
-      {/* <Pallet pallteclickdOnQuestion={pallteclickdOnQuestion}
-        currentQuestionIndex={currentQuestionIndex} /> */}
       <div className="question-main-container">
         {questionsDataLoaded && (
-          <div className='question-container'>
+          <div className={`question-container ${!questionAreaVisible ? 'loading' : ""} `}>
             <Question_heading currentQuestionCount={currentQuestionNo + 1} />
             <form onSubmit={handleSubmit}>
               {questionText && (
                 <div className="single-question">
                   <h3>{questionText}</h3>
-                   {['A', 'B', 'C', 'D'].map((option) => (
-                    <label className="quesOpt" htmlFor={`${currentQuestionIndex}-${option}`} key={option}>
-                    <div className='perseusInteractive'>
-                      <Input
-                        type="radio"
-                        id={`${currentQuestionIndex}-${option}`}
-                        name={`${currentQuestionIndex}`}
-                        // Here we can manage checkbox states as needed
-                        checked={selectedAnswers[currentQuestionIndex] === option}
-                        onChange={() => ''}
-                      />
-                      <span className='iconWrapper'>{option}</span>
-                    </div>
-                    <span className='optionTxt'>
-                      {/* {`${questionData[currentQuestionIndex][option]}`} */}
-                    </span>
-                  </label>
-                  ))} 
+                  {questionsOptionsArr[0].map((option,index) => (
+                    <label className="quesOpt" htmlFor={`${index}-${currentQuestionNo}`} key={option}>
+                      <div className='perseusInteractive'>
+                        <Input
+                          type="radio"
+                          id={`${index}-${currentQuestionNo}`}
+                          name={`${index}`}
+                          // Here we can manage checkbox states as needed
+                          checked={selectedAnswers[index] === currentQuestionNo}
+                          onChange={() => ''}
+                        />
+                        <span className='iconWrapper'>{decryptPassword(atob(option))}</span>
+                      </div>
+                      <span className='optionTxt'>
+                        {/* {`${questionData[currentQuestionIndex][option]}`} */}
+                      </span>
+                    </label>
+                  ))}
                 </div>
               )}
             </form>
@@ -112,7 +111,7 @@ export default function QuestionArea({ questionAreaProps }) {
           onPrevious={handlePreviousClick}
           onNext={handleNextClick}
           currentQuestionIndex={currentQuestionIndex}
-          // totalQuestions={questionData.length} 
+        // totalQuestions={questionData.length} 
         // totalQuestions={questionsDataLoaded.length}
         />
       </div>
