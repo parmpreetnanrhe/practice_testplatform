@@ -1,54 +1,68 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { Button } from './Button'
-import SelectComponent from './SelectComponent';
-import { PracticeQuesPallet } from '../contexts/PracticeQuesPalletContext';
-import QuestionArea from './QuestionArea';
-import { FetchQuestionDataApi } from '../apis/FetchQuestionDataApi';
-import FullScreenLoader from './modalComponent/FullScreenLoader';
+import React, { useContext, useEffect, useState } from "react";
+import { Button } from "./Button";
+import SelectComponent from "./SelectComponent";
+import { PracticeQuesPallet } from "../contexts/PracticeQuesPalletContext";
+import QuestionArea from "./QuestionArea";
+import { FetchQuestionDataApi } from "../apis/FetchQuestionDataApi";
+import FullScreenLoader from "./modalComponent/FullScreenLoader";
+import TestStartTimer from "./TestStartTimer";
+import TestStartTimerProvider from "./TestStartTimer";
 
-export default function Pallet({ }) {
+export default function Pallet({}) {
   const [questionsDataLoaded, setQuestionsDataLoaded] = useState([]);
   const [currentQuestionNo, setCurrentQuestionNo] = useState(0);
   const [categoryNamesArray, setCategoryNamesArray] = useState([]);
   const [palletQuestionBoxData, setPalletQuestionBoxData] = useState([]);
   const [questionAreaVisible, setQuestionAreaVisible] = useState(false);
-  const [showScreenLoader, setShowScreenLoader] = useState(true)
+  const [showScreenLoader, setShowScreenLoader] = useState(true);
   const [isPalletOpen, setIsPalletOpen] = useState(true);
+  const [disabled, setDisabled] = useState(false);
 
   // pallet data coming from context
   const palletData = useContext(PracticeQuesPallet);
   const pQuesData = palletData.palletQueData;
   const loading = palletData.loading;
-  console.log(loading)
+  console.log(loading);
 
-  const optionsArray = ['All', 'Correct', 'Incorrect', 'Un-attempted', 'Flagged'];
+  const optionsArray = [
+    "All",
+    "Correct",
+    "Incorrect",
+    "Un-attempted",
+    "Flagged",
+  ];
   const options2 = optionsArray.map((option, index) => ({
     value: index,
-    label: option
+    label: option,
   }));
 
   const togglePanel = () => {
-    setIsPalletOpen(!isPalletOpen);
+    if (disabled) {
+      setIsPalletOpen(!isPalletOpen);
+    }
   };
 
   // Fetch question data when a question-box is clicked
   const handleQuestionClick = async (platformLink, questionNo) => {
     setIsPalletOpen(false);
-    setQuestionAreaVisible(false);
-    setShowScreenLoader(false);
+    setQuestionAreaVisible(false); 
+    setShowScreenLoader(true);
     await FetchQuestionDataApi(platformLink, questionNo)
-      .then(data => {
+      .then((data) => {
         setQuestionsDataLoaded(data);
         setCurrentQuestionNo(questionNo);
         setQuestionAreaVisible(true);
-      }).catch(error => console.error('Error fetching question data:', error));
-  }
+        setDisabled(true); 
+      setShowScreenLoader(false);
+      })
+      .catch((error) => console.error("Error fetching question data:", error));
+  };
 
   useEffect(() => {
     setPalletQuestionBoxData(pQuesData.questionsData);
     if (pQuesData && pQuesData.categoryNamesArray) {
-      const categoriesWithSubCats = pQuesData.categoryNamesArray.filter(category =>
-        category.subCats && category.subCats.length > 0
+      const categoriesWithSubCats = pQuesData.categoryNamesArray.filter(
+        (category) => category.subCats && category.subCats.length > 0
       );
       const categories = categoriesWithSubCats.map((data) => ({
         value: data.cateId,
@@ -56,31 +70,51 @@ export default function Pallet({ }) {
       }));
       setCategoryNamesArray(categories);
     }
-  }, [pQuesData])
-
+  }, [pQuesData]);
 
   return (
     <>
+    {questionAreaVisible && (
+      <TestStartTimerProvider>
+        <QuestionArea
+          questionAreaProps={{
+            questionsDataLoaded,
+            currentQuestionNo,
+            handleQuestionClick,
+            palletQuestionBoxData,
+            questionAreaVisible,
+          }}
+        /> 
+      </TestStartTimerProvider>
+      )}
+      {showScreenLoader && (
+        <FullScreenLoader
+          text={
+            questionAreaVisible ? "Please wait while we are loading..." : ""
+          }
+        />
+      )}
 
-      <QuestionArea questionAreaProps={{ questionsDataLoaded, currentQuestionNo, handleQuestionClick, palletQuestionBoxData, questionAreaVisible }} />
-
-      {(showScreenLoader) && <FullScreenLoader text={questionAreaVisible ? "Please wait while we are loading..." : ""} />}
-
-      <div className={`pallet-button ${isPalletOpen ? 'pallet-button-move' : ''}`}>
+      <div
+        className={`pallet-button ${isPalletOpen ? "pallet-button-move" : ""} ${
+          showScreenLoader ? "disabledEvents" : ""
+        }`}
+      >
         <Button
           type="button"
           title="Expand"
           className="right-button"
           text="<"
-          onClick={togglePanel} >
+          onClick={togglePanel}
+        >
           <img
             src={`${process.env.PUBLIC_URL}/img/whitebackicon.svg`}
-            style={isPalletOpen ? { transform: 'rotate(539deg)' } : {}}
+            style={isPalletOpen ? { transform: "rotate(539deg)" } : {}}
             alt="Arrow Icon"
           />
         </Button>
       </div>
-      <div className={`side-panel ${isPalletOpen ? 'open' : ''} `}>
+      <div className={`side-panel ${isPalletOpen ? "open" : ""} `}>
         <div className={`select-pallet-tag `}>
           <SelectComponent
             options={categoryNamesArray}
@@ -96,26 +130,43 @@ export default function Pallet({ }) {
           />
         </div>
         <div className={`question-box-container`}>
-        {palletQuestionBoxData && palletQuestionBoxData.length > 0 ? (
-        palletQuestionBoxData.map((queData, index) => (
-          <div
-            key={queData.questionId}
-            className={`ques-box ${((queData.questionNo - 1) === currentQuestionNo && questionAreaVisible) ? "quesBoxDisabled" : ""}`}
-            onClick={() => handleQuestionClick(queData.platformLink, (queData.questionNo - 1))}
-          >
-            <span>{queData.questionNo}</span>
-          </div>
-        ))
-      ) : (
-        Array(55).fill().map((_, i) => (
-          <div key={i} className={`ques-box ${loading ? "loading" : ""}`}>
-            <span>{i + 1}</span> {/* Displaying 1 to 56 */}
-          </div>
-        ))
-      )}
-
+          {palletQuestionBoxData && palletQuestionBoxData.length > 0
+            ? palletQuestionBoxData.map((queData, index) => (
+                <div
+                  key={queData.questionId}
+                  className={`ques-box ${
+                    queData.questionNo - 1 === currentQuestionNo &&
+                    questionAreaVisible
+                      ? "disabledEvents"
+                      : ""
+                  }`}
+                  onClick={() => {
+                    if (
+                      !questionAreaVisible ||
+                      queData.questionNo - 1 !== currentQuestionNo
+                    ) {
+                      handleQuestionClick(
+                        queData.platformLink,
+                        queData.questionNo - 1
+                      );
+                    }
+                  }}
+                >
+                  <span>{queData.questionNo}</span>
+                </div>
+              ))
+            : Array(55)
+                .fill()
+                .map((_, i) => (
+                  <div
+                    key={i}
+                    className={`ques-box ${loading ? "loading" : ""}`}
+                  >
+                    <span>{i + 1}</span> {/* Displaying 1 to 56 */}
+                  </div>
+                ))}
         </div>
       </div>
     </>
-  )
+  );
 }

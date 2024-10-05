@@ -21,7 +21,7 @@ const TestInfoData = useContext(TestInfoContext);
           type={2}
           title="Timer"
           className="timerTitle"
-          text={`${testTimeStarts}`}
+          text={`${testTimeStarts.formatTime(testTimeStarts.testTimeSpent)}`}
         />
       </div>
       <div className="subHeaderIconBar">
