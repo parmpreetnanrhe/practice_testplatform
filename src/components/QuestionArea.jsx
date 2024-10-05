@@ -19,7 +19,22 @@ export default function QuestionArea({ questionAreaProps }) {
   const [questionText, setQuestionText] = useState();
   const [currentQuesData, setCurrentQuesData] = useState();
   const [questionsOptionsArr, setquestionsOptionsArr] = useState([]);
+  // State to manage visibility of SecondComponent
+  const [isVisible, setIsVisible] = useState(false);
+  const [isStrikeItems, setIsStrike] = useState({});
 
+  // Toggle the visibility of SecondComponent
+  const handleToggleVisibility = () => {
+    setIsVisible(!isVisible);
+    setIsStrike(Array());
+  };
+
+  const setStrike = (index) => {
+    const newVisibleItems = [...isStrikeItems];
+    // If the item is already visible, hide it. Otherwise, make it visible and keep other items visible.
+    newVisibleItems[index] = !newVisibleItems[index];
+    setIsStrike(newVisibleItems);
+  }
 
   const handleNextClick = () => {
     if (currentQuestionIndex.current < palletQuestionBoxData.length - 1) {
@@ -90,29 +105,39 @@ export default function QuestionArea({ questionAreaProps }) {
       <div className="question-main-container">
         {questionText && (
           <div className={`question-container ${!questionAreaVisible ? 'loading' : ""} `}>
-            <Question_heading currentQuestionCount={currentQuestionNo + 1} />
+            <Question_heading onClick={handleToggleVisibility} currentQuestionCount={currentQuestionNo + 1} />
             <form onSubmit={handleSubmit}>
               {questionText && (
                 <div className="single-question">
                   <h3>{questionText}</h3>
                   {questionsOptionsArr[0].map((option,index) => (
-                    <label className={`quesOpt ${!questionAreaVisible ? 'loading' : ""}`} htmlFor={`${index+1}-${currentQuestionNo}`} key={option}>
-                      <div className='perseusInteractive'>
-                        <Input
-                          type="radio"
-                          id={`${index+1}-${currentQuestionNo}`}
-                          name={`${currentQuestionNo}`}
-                          // Here we can manage checkbox states as needed
-                          value={index+1}
-                          checked={selectedAnswers[currentQuestionNo] === index+1}
-                          onChange={() => handleCheckboxChange(index+1)}
-                        />
-                        <span className='iconWrapper'>{convertToLetter(index+1)}</span>
-                      </div>
-                      <span className='optionTxt'>
-                        {decryptPassword(atob(option))}
-                      </span>
-                    </label>
+                    <div className='quesOptions'>
+                      <label className={`quesOpt ${!questionAreaVisible ? 'loading' : ""}`} htmlFor={`${index+1}-${currentQuestionNo}`} key={option}>
+                        {isStrikeItems[index] && isVisible && (
+                          <div className='optStrike'></div>
+                        )}
+                        <div className='perseusInteractive'>
+                          <Input
+                            type="radio"
+                            id={`${index+1}-${currentQuestionNo}`}
+                            name={`${currentQuestionNo}`}
+                            // Here we can manage checkbox states as needed
+                            value={index+1}
+                            checked={selectedAnswers[currentQuestionNo] === index+1 && !isStrikeItems[index]}
+                            onChange={() => handleCheckboxChange(index+1)}
+                          />
+                          <span className='iconWrapper'>{convertToLetter(index+1)}</span>
+                        </div>
+                        <span className='optionTxt'>
+                          {decryptPassword(atob(option))}
+                        </span>
+                      </label>
+                      {isVisible && (
+                        <div className='optDisabled' onClick={()=>setStrike(index)}>
+                          <span className='iconWrapper'>{convertToLetter(index+1)}</span>
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}
