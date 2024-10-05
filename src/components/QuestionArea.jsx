@@ -31,6 +31,7 @@ export default function QuestionArea({ questionAreaProps }) {
   const [currentQuesData, setCurrentQuesData] = useState();
   const [questionsOptionsArr, setquestionsOptionsArr] = useState([]);
 
+
   const handleNextClick = () => {
     console.log(currentQuestionIndex.current)
     if (currentQuestionIndex.current < palletQuestionBoxData.length - 1) {
@@ -97,41 +98,27 @@ export default function QuestionArea({ questionAreaProps }) {
       <SubHeader currentQuestionCount={currentQuestionNo + 1} testTimeStarts={testTimerStarts} />
       <div className="question-main-container">
         {questionText && (
-          <div
-            className={`question-container ${
-              !questionAreaVisible ? "loading" : ""
-            } `}
-          >
+          <div className={`question-container ${!questionAreaVisible ? 'loading' : ""} `}>
             <Question_heading currentQuestionCount={currentQuestionNo + 1} />
             <form onSubmit={handleSubmit}>
               {questionText && (
                 <div className="single-question">
                   <h3>{questionText}</h3>
-                  {questionsOptionsArr[0].map((option, index) => (
-                    <label
-                      className={`quesOpt ${
-                        !questionAreaVisible ? "loading" : ""
-                      }`}
-                      htmlFor={`${index + 1}-${currentQuestionNo}`}
-                      key={option}
-                    >
-                      <div className="perseusInteractive">
+                  {questionsOptionsArr[0].map((option,index) => (
+                    <label className={`quesOpt ${!questionAreaVisible ? 'loading' : ""}`} htmlFor={`${index+1}-${currentQuestionNo}`} key={option}>
+                      <div className='perseusInteractive'>
                         <Input
                           type="radio"
-                          id={`${index + 1}-${currentQuestionNo}`}
+                          id={`${index+1}-${currentQuestionNo}`}
                           name={`${currentQuestionNo}`}
                           // Here we can manage checkbox states as needed
-                          value={index + 1}
-                          checked={
-                            selectedAnswers[currentQuestionNo] === index + 1
-                          }
-                          onChange={() => handleCheckboxChange(index + 1)}
+                          value={index+1}
+                          checked={selectedAnswers[currentQuestionNo] === index+1}
+                          onChange={() => handleCheckboxChange(index+1)}
                         />
-                        <span className="iconWrapper">
-                          {convertToLetter(index + 1)}
-                        </span>
+                        <span className='iconWrapper'>{convertToLetter(index+1)}</span>
                       </div>
-                      <span className="optionTxt">
+                      <span className='optionTxt'>
                         {decryptPassword(atob(option))}
                       </span>
                     </label>
