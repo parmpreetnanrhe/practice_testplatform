@@ -527,6 +527,7 @@ div.loading::after {
 .optDisabled {
   margin-bottom: 1rem;
   position: relative;
+  cursor: pointer;
 }
 
 .optStrike {
@@ -551,5 +552,4 @@ div.loading::after {
 .optDisabled span.iconWrapper {
   border-width: 1px;
   font-weight: 400;
-  cursor: pointer;
 }

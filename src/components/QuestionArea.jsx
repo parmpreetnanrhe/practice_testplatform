@@ -24,7 +24,7 @@ export default function QuestionArea({ questionAreaProps }) {
   const [isStrikeItems, setIsStrike] = useState({});
 
   // Toggle the visibility of SecondComponent
-  const handleToggleVisibility = () => {
+  const handleToggleVisibility = (d,f) => {
     setIsVisible(!isVisible);
     setIsStrike(Array());
   };
