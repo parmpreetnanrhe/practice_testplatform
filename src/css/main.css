@@ -462,13 +462,13 @@ span.iconWrapper {
 }
 
 .quesBoxDisabled {
-  background-color: #f0f0f0;  /* Light gray background */
-  color: #a9a9a9;             /* Gray text */
-  cursor: not-allowed;        /* Change cursor to indicate it is disabled */
-  pointer-events: none;       /* Disable all interactions */
-  opacity: 0.6;               /* Reduce opacity */
-  border: 1px solid #d3d3d3;  /* Add a subtle border */
-  position: relative;         /* Required for positioning the icon */
+  background-color: #f0f0f0;  
+  color: #a9a9a9;            
+  cursor: not-allowed;       
+  pointer-events: none;       
+  opacity: 0.6;               
+  border: 1px solid #d3d3d3; 
+  position: relative;        
 }
 
 /* Add an icon on hover */
@@ -514,3 +514,4 @@ div.loading::after {
       background-position-x: 0%
   }
 }
+
