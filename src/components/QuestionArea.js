@@ -5,6 +5,7 @@ import { Question_heading } from './Question_heading';
 import { QuestionDataContext } from '../contexts/QuestionDataContext';
 import { decryptPassword } from '../commonFunctions/decryptPassword';
 import Input from './Input';
+import SubHeader from './SubHeader';
 
 export default function QuestionArea({ questionAreaProps }) {
   const { questionsDataLoaded, currentQuestionNo, handleQuestionClick, palletQuestionBoxData, questionAreaVisible } = questionAreaProps;
@@ -85,6 +86,7 @@ export default function QuestionArea({ questionAreaProps }) {
 
   return (
     <>
+    <SubHeader />
       <div className="question-main-container">
         {questionText && (
           <div className={`question-container ${!questionAreaVisible ? 'loading' : ""} `}>
@@ -94,7 +96,7 @@ export default function QuestionArea({ questionAreaProps }) {
                 <div className="single-question">
                   <h3>{questionText}</h3>
                   {questionsOptionsArr[0].map((option,index) => (
-                    <label className="quesOpt" htmlFor={`${index+1}-${currentQuestionNo}`} key={option}>
+                    <label className={`quesOpt ${!questionAreaVisible ? 'loading' : ""}`} htmlFor={`${index+1}-${currentQuestionNo}`} key={option}>
                       <div className='perseusInteractive'>
                         <Input
                           type="radio"

@@ -6,7 +6,7 @@ export const PracticeQuesPallet = createContext(null);
 
 export const PracticeQuesPalletContextProvider = ({ children }) => {
     const [palletQueData, setPalletQueData] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const isDataAvailable = palletQueData && Object.keys(palletQueData).length > 0;
 
@@ -15,7 +15,7 @@ export const PracticeQuesPalletContextProvider = ({ children }) => {
         await PracticeQuePalletApi()
             .then(data => {
                 setPalletQueData(data);
-                setLoading(true);
+                setLoading(false);
                 setError(error); 
             })
             .catch(error => console.error('Error fetching question data:', error));

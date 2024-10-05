@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const SelectComponent = ({ options, onSelectChange, defaultText = "Select an option" }) => {
+const SelectComponent = ({ options, onSelectChange, defaultText = "Select an option" ,className}) => {
   const [selectedValue, setSelectedValue] = useState(defaultText);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -35,7 +35,7 @@ const SelectComponent = ({ options, onSelectChange, defaultText = "Select an opt
 
   return (
     <>
-      <div className="filterDropdown" onClick={openDropdown} ref={dropdownRef}>
+      <div className={`filterDropdown ${className}`} onClick={openDropdown} ref={dropdownRef} >
         <div className="selectedVal" >
           {selectedValue}
         </div>
