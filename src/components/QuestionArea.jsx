@@ -24,7 +24,7 @@ export default function QuestionArea({ questionAreaProps }) {
 
   currentQuestionIndex.current = currentQuestionNo;
 
-  const [selectedAnswers, setSelectedAnswers] = useState({}); // Store user Answer Selection
+  const [selectedAnswers, setSelectedAnswers] = useState(''); // Store user Answer Selection
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [loadQuestionSts, setLadQuestionSts] = useState(false);
   const [questionText, setQuestionText] = useState();
@@ -35,20 +35,21 @@ export default function QuestionArea({ questionAreaProps }) {
   const [isStrikeItems, setIsStrike] = useState({});
 
   // Toggle the visibility of SecondComponent
-  const handleToggleVisibility = (d,f) => {
+  const handleToggleVisibility = () => {
     setIsVisible(!isVisible);
     setIsStrike(Array());
   };
 
   const setStrike = (index) => {
     const newVisibleItems = [...isStrikeItems];
+    const newSelectedAns = (selectedAnswers == index+1)?'':selectedAnswers;
     // If the item is already visible, hide it. Otherwise, make it visible and keep other items visible.
     newVisibleItems[index] = !newVisibleItems[index];
+    setSelectedAnswers(newSelectedAns);
     setIsStrike(newVisibleItems);
   }
 
   const handleNextClick = () => {
-    console.log(currentQuestionIndex.current)
     if (currentQuestionIndex.current < palletQuestionBoxData.length - 1) {
       currentQuestionIndex.current += 1;
       updateQuestionData(currentQuestionIndex.current);
@@ -98,10 +99,7 @@ export default function QuestionArea({ questionAreaProps }) {
   };
 
   const handleCheckboxChange = (option) => {
-    setSelectedAnswers((prevState) => ({
-      ...prevState,
-      [currentQuestionNo]: option,
-    }));
+    setSelectedAnswers(option);
   };
 
   const convertToLetter = (num) => {
@@ -124,8 +122,8 @@ export default function QuestionArea({ questionAreaProps }) {
                 <div className="single-question">
                   <h3>{questionText}</h3>
                   {questionsOptionsArr[0].map((option,index) => (
-                    <div className='quesOptions'>
-                      <label className={`quesOpt ${!questionAreaVisible ? 'loading' : ""}`} htmlFor={`${index+1}-${currentQuestionNo}`} key={option}>
+                    <div className={`quesOptions${isStrikeItems[index]? ' strikeCls' : ''}`} key={option}>
+                      <label className={`quesOpt ${!questionAreaVisible ? 'loading' : ""}`} htmlFor={`${index+1}-${currentQuestionNo}`}>
                         {isStrikeItems[index] && isVisible && (
                           <div className='optStrike'></div>
                         )}
@@ -136,7 +134,8 @@ export default function QuestionArea({ questionAreaProps }) {
                             name={`${currentQuestionNo}`}
                             // Here we can manage checkbox states as needed
                             value={index+1}
-                            checked={selectedAnswers[currentQuestionNo] === index+1 && !isStrikeItems[index]}
+                            disabled={isStrikeItems[index]}
+                            checked={selectedAnswers === index+1 && !isStrikeItems[index]}
                             onChange={() => handleCheckboxChange(index+1)}
                           />
                           <span className='iconWrapper'>{convertToLetter(index+1)}</span>
@@ -147,7 +146,13 @@ export default function QuestionArea({ questionAreaProps }) {
                       </label>
                       {isVisible && (
                         <div className='optDisabled' onClick={()=>setStrike(index)}>
-                          <span className='iconWrapper'>{convertToLetter(index+1)}</span>
+                          {isStrikeItems[index] ? (
+                              <span className='undoCls'>Undo</span>
+                            ) : (
+
+                              <span className='iconWrapper strikeIcon'>{convertToLetter(index+1)}</span>
+                            )
+                          }
                         </div>
                       )}
                     </div>
@@ -163,7 +168,7 @@ export default function QuestionArea({ questionAreaProps }) {
           onPrevious={(questionAreaVisible ? handlePreviousClick : null)}
           onNext={(questionAreaVisible ? () => handleNextClick() : null)}
           currentQuestionIndex={currentQuestionIndex}
-          // totalQuestions={questionData.length}
+          totalQuestions={palletQuestionBoxData.length}
           // totalQuestions={questionsDataLoaded.length}
         />
       </div> 
