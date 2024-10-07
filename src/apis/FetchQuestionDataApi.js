@@ -3,7 +3,7 @@ import axios from 'axios';
 export const FetchQuestionDataApi = async (payLoads) => {
   const payload = {
     dev: 10,
-    platform: "android", 
+    platform: "android",
     app_flag: 11,
     app_type: "mycoach",
     client_id: 5480,
@@ -18,16 +18,22 @@ export const FetchQuestionDataApi = async (payLoads) => {
     cms_id: 496956,
     payLoads // Adding payLoads dynamically to the payload
   };
+  const queryString = Object.keys(payload)
+    .map(key => `${key}=${payload[key]}`)
+    .join('&');
 
+  console.log(queryString);
   try {
     const response = await axios.post(
-      '/app/api/practiceQueDataFetchApiGeneric.php', 
-      payload,
+      '/app/api/practiceQueDataFetchApiGeneric.php',
+       payload,
       {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/x-www-form-urlencoded", // or 'application/json' if the server expects JSON
           "Access-Control-Allow-Origin": "*",
         },
+        body: "dev=10&platform=android&app_flag=11&app_type=mycoach&client_id=5480&version=93&device_id=587831233a4827f7&device_details=MANUFACTURER%3Dsamsung%20MODEL%3DSM-E225F%20RELEASE%3D13%20SDK%3DTIRAMISUDevice%20Id%20TP1A.220624.014&user_type=0&user_idd=496956&user_id=496956&beta_idd=496956&beta_id=496956&cms_id=496956&payLoads=" + payLoads,
       }
     );
     // Return the data instead of setting state

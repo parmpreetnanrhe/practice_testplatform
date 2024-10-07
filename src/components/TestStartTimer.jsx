@@ -3,7 +3,7 @@ import React, { createContext, useEffect, useState } from 'react';
 export const TestStartTimerContext = createContext(null);
 
 export default function TestStartTimerProvider({ children }) {  
-    const [testTimeSpent, setTestTimeSpent] = useState(0); 
+    const [testTimeSpent, setTestTimeSpent] = useState(1); 
 
     useEffect(() => {  
         const countdown = setInterval(() => {

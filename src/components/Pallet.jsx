@@ -17,11 +17,12 @@ export default function Pallet({}) {
   const [showScreenLoader, setShowScreenLoader] = useState(true);
   const [isPalletOpen, setIsPalletOpen] = useState(true);
   const [disabled, setDisabled] = useState(false);
-
+  const [loaderText,setLoaderText] = useState("");
   // pallet data coming from context
   const palletData = useContext(PracticeQuesPallet);
   const pQuesData = palletData.palletQueData;
   const loading = palletData.loading;
+  const handlePalletQuestionsLoad = palletData.handlePalletLoadApi;
   console.log(loading);
 
   const optionsArray = [
@@ -45,18 +46,32 @@ export default function Pallet({}) {
   // Fetch question data when a question-box is clicked
   const handleQuestionClick = async (platformLink, questionNo) => {
     setIsPalletOpen(false);
-    setQuestionAreaVisible(false); 
+    setQuestionAreaVisible(false);
     setShowScreenLoader(true);
+    setLoaderText("Please wait while we are loading...");
     await FetchQuestionDataApi(platformLink, questionNo)
       .then((data) => {
+        if(data.success == 0){
+          alert("Something went wrong Pallet API!");
+        }
         setQuestionsDataLoaded(data);
         setCurrentQuestionNo(questionNo);
         setQuestionAreaVisible(true);
-        setDisabled(true); 
-      setShowScreenLoader(false);
+        setDisabled(true);
+        setShowScreenLoader(false);
       })
       .catch((error) => console.error("Error fetching question data:", error));
   };
+
+  const [selectedCategory, setSelectedCategory] = useState(''); 
+  const handlePalletDataLoad = (selectedValue) =>{
+    setShowScreenLoader(true);
+    palletData.setLoading(true);
+    const payLoads = "Y2twbGZPaHpgcG56fDokIiUjOCEvZHRmcE52PD8kOCMkMD98em17ekl+bGFxOiU0ZGZtYX1uenxmRXdtYXpvR3s+an9rbWJna3Ane2p1YXt7dFxreWIoc2Zkd29qfWZ0MmVwY3ppe1p8Z2Q1ZGt5NHR5aWpbYmRncHRmPD8=";
+    handlePalletQuestionsLoad(payLoads);
+    setSelectedCategory(selectedValue);
+    console.log("Selected value from dropdown: ", selectedValue); 
+  }
 
   useEffect(() => {
     setPalletQuestionBoxData(pQuesData.questionsData);
@@ -74,24 +89,21 @@ export default function Pallet({}) {
 
   return (
     <>
-    {questionAreaVisible && (
-      <TestStartTimerProvider>
-        <QuestionArea
-          questionAreaProps={{
-            questionsDataLoaded,
-            currentQuestionNo,
-            handleQuestionClick,
-            palletQuestionBoxData,
-            questionAreaVisible,
-          }}
-        /> 
-      </TestStartTimerProvider>
+      {questionAreaVisible && ( 
+          <QuestionArea
+            questionAreaProps={{
+              questionsDataLoaded,
+              currentQuestionNo,
+              handleQuestionClick,
+              palletQuestionBoxData,
+              questionAreaVisible,
+            }}
+          /> 
       )}
+      
       {showScreenLoader && (
         <FullScreenLoader
-          text={
-            questionAreaVisible ? "Please wait while we are loading..." : ""
-          }
+          text={loaderText}
         />
       )}
 
@@ -118,7 +130,7 @@ export default function Pallet({}) {
         <div className={`select-pallet-tag `}>
           <SelectComponent
             options={categoryNamesArray}
-            onSelectChange=""
+            onSelectChange={handlePalletDataLoad}
             defaultText="Please select a value"
             className={`${loading ? "loading" : ""}`}
           />
@@ -160,7 +172,7 @@ export default function Pallet({}) {
                 .map((_, i) => (
                   <div
                     key={i}
-                    className={`ques-box ${loading ? "loading" : ""}`}
+                    className="ques-box loading"
                   >
                     <span>{i + 1}</span> {/* Displaying 1 to 56 */}
                   </div>
