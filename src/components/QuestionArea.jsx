@@ -4,6 +4,7 @@ import { UserInfoAuthContext } from "../contexts/UserInfoContext";
 import { Question_heading } from "./Question_heading";
 import { QuestionDataContext } from "../contexts/QuestionDataContext";
 import { decryptPassword } from "../commonFunctions/decryptPassword";
+import CalcModal  from "./modalComponent/CalcModal";
 import Input from "./Input";
 import SubHeader from "./SubHeader";
 import TestStartTimerProvider, {
@@ -34,9 +35,10 @@ export default function QuestionArea({ questionAreaProps }) {
   const [isVisible, setIsVisible] = useState(false);
   const [isStrikeItems, setIsStrike] = useState({});
   const [currentQuestionId, setCurrentQuestionId] = useState(0);
+  const [isOpenCalc, setIsOpenCalc] = useState(false);
 
   // Toggle the visibility of SecondComponent
-  const handleToggleVisibility = (d,f) => {
+  const handleToggleVisibility = () => {
     setIsVisible(!isVisible);
     setIsStrike(Array());
   };
@@ -51,7 +53,6 @@ export default function QuestionArea({ questionAreaProps }) {
   };
 
   const handleNextClick = () => {
-    console.log(currentQuestionIndex.current)
     if (currentQuestionIndex.current < palletQuestionBoxData.length - 1) {
       currentQuestionIndex.current += 1;
       updateQuestionData(currentQuestionIndex.current);
@@ -109,10 +110,7 @@ export default function QuestionArea({ questionAreaProps }) {
   };
 
   const handleCheckboxChange = (option) => {
-    setSelectedAnswers((prevState) => ({
-      ...prevState,
-      [currentQuestionNo]: option,
-    }));
+    setSelectedAnswers(option);
   };
 
   const convertToLetter = (num) => {
@@ -139,12 +137,17 @@ export default function QuestionArea({ questionAreaProps }) {
     }`;
   };
 
+  const showCalc = () => {
+    setIsOpenCalc(!isOpenCalc);
+  } 
+
   return (
     <>
       <form onSubmit={handleSubmit}>
         <SubHeader
           currentQuestionCount={currentQuestionNo + 1}
           testTimeStarts={formatTime(testTimeSpent)}
+          showCalc = {showCalc}
         />
         <div className="question-main-container">
           {questionText && (
@@ -161,8 +164,8 @@ export default function QuestionArea({ questionAreaProps }) {
                 <div className="single-question">
                   <h3>{questionText}</h3>
                   {questionsOptionsArr[0].map((option,index) => (
-                    <div className='quesOptions'>
-                      <label className={`quesOpt ${!questionAreaVisible ? 'loading' : ""}`} htmlFor={`${index+1}-${currentQuestionNo}`} key={option}>
+                    <div className={`quesOptions${isStrikeItems[index]? ' strikeCls' : ''}`} key={option}>
+                      <label className={`quesOpt ${!questionAreaVisible ? 'loading' : ""}`} htmlFor={`${index+1}-${currentQuestionNo}`}>
                         {isStrikeItems[index] && isVisible && (
                           <div className="optStrike"></div>
                         )}
@@ -173,7 +176,8 @@ export default function QuestionArea({ questionAreaProps }) {
                             name={`${currentQuestionNo}`}
                             // Here we can manage checkbox states as needed
                             value={index+1}
-                            checked={selectedAnswers[currentQuestionNo] === index+1 && !isStrikeItems[index]}
+                            disabled={isStrikeItems[index]}
+                            checked={selectedAnswers === index+1 && !isStrikeItems[index]}
                             onChange={() => handleCheckboxChange(index+1)}
                           />
                           <span className="iconWrapper">
@@ -186,7 +190,12 @@ export default function QuestionArea({ questionAreaProps }) {
                       </label>
                       {isVisible && (
                         <div className='optDisabled' onClick={()=>setStrike(index)}>
-                          <span className='iconWrapper'>{convertToLetter(index+1)}</span>
+                          {isStrikeItems[index] ? (
+                              <span className='undoCls'>Undo</span>
+                            ) : (
+                              <span className='iconWrapper strikeIcon'>{convertToLetter(index+1)}</span>
+                            )
+                          }
                         </div>
                       )}
                     </div>
@@ -207,6 +216,10 @@ export default function QuestionArea({ questionAreaProps }) {
           // totalQuestions={questionsDataLoaded.length}
         />
       </div>
+      <CalcModal
+        isOpen = {isOpenCalc}
+        showCalc = {showCalc}
+      />
     </>
   );
 }
