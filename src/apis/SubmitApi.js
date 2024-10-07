@@ -1,10 +1,7 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
 
-export const PracticeQuePalletApi = async (payLoads) => { 
-
+export const SubmitApi = async (payLoads) => {
   const payload = {
-    payLoads: payLoads,
     dev: 10,
     platform: "android",
     app_flag: 11,
@@ -19,28 +16,29 @@ export const PracticeQuePalletApi = async (payLoads) => {
     beta_idd: 496956,
     beta_id: 496956,
     cms_id: 496956,
+    payLoads // Adding payLoads dynamically to the payload
   };
   const queryString = Object.keys(payload)
     .map(key => `${key}=${payload[key]}`)
     .join('&');
-
+ 
   try {
     const response = await axios.post(
-      'app/api/practiceQuePalletApiGeneric.php',
-      payload,
+      '/app/api/practiceQueSubmitApiGeneric.php',
+       payload,
       {
         method: 'POST',
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Type": "application/x-www-form-urlencoded", // or 'application/json' if the server expects JSON
           "Access-Control-Allow-Origin": "*",
         },
         body: queryString,
       }
     );
+    // Return the data instead of setting state
     return response.data;
   } catch (err) {
     console.error('Error fetching data:', err);
     throw err; // Re-throw the error so it can be handled elsewhere
   }
-
-}
+};

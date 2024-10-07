@@ -25,7 +25,7 @@ export default function QuestionArea({ questionAreaProps }) {
   currentQuestionIndex.current = currentQuestionNo;
 
   const [selectedAnswers, setSelectedAnswers] = useState(''); // Store user Answer Selection
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(questionsDataLoaded);
   const [loadQuestionSts, setLadQuestionSts] = useState(false);
   const [questionText, setQuestionText] = useState();
   const [currentQuesData, setCurrentQuesData] = useState();
@@ -42,9 +42,8 @@ export default function QuestionArea({ questionAreaProps }) {
   };
 
   const setStrike = (index) => {
-    const newVisibleItems = [...isStrikeItems];
-    const newSelectedAns = (selectedAnswers == index+1)?'':selectedAnswers;
-    // If the item is already visible, hide it. Otherwise, make it visible and keep other items visible.
+    const newVisibleItems = [...isStrikeItems]; 
+    const newSelectedAns = (selectedAnswers == index+1)?'':selectedAnswers; 
     newVisibleItems[index] = !newVisibleItems[index];
     setSelectedAnswers(newSelectedAns);
     setIsStrike(newVisibleItems);
@@ -93,24 +92,36 @@ export default function QuestionArea({ questionAreaProps }) {
   }, [questionsDataLoaded]);
 
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
+    answerGiven: "", 
   });
 
-  // Handle form input changes and update state
-  const handleSubmit = (e) => {
-    const { name, value } = e.target;
-    setIsSubmitted(true);
-    setFormData({
-      ...formData,
-      [name]: value, // Dynamically update the form field being changed
-    });
-    console.log(formData);
-  };
 
+
+  const handleSubmit = (e) => {
+
+    setIsSubmitted(prevOnj => {
+      return {
+        ...prevOnj, // Keep the previous state
+        testData: {
+          ...prevOnj.testData, // Keep other testData properties
+          sectionsData: [
+            ...prevOnj.testData.sectionsData, // Spread the existing questions 
+          ].map(question => {
+            console.log(question);
+            return {
+              ...question,
+              testTimeSpentttttttttttttttttttttttttttttttttt: testTimeSpent
+            };
+          })
+        }
+      };
+    });
+     console.log(isSubmitted.testData.sectionsData);
+    // console.log('Form Data Submitted:', selectedAnswers, testTimeSpent);
+  };
+  
   const handleCheckboxChange = (option) => {
-    setSelectedAnswers((prevState) => ({
-      ...prevState,
+    setSelectedAnswers(() => ({ 
       [currentQuestionNo]: option,
     }));
   };
@@ -140,8 +151,7 @@ export default function QuestionArea({ questionAreaProps }) {
   };
 
   return (
-    <>
-      <form onSubmit={handleSubmit}>
+    <> 
         <SubHeader
           currentQuestionCount={currentQuestionNo + 1}
           testTimeStarts={formatTime(testTimeSpent)}
@@ -162,15 +172,15 @@ export default function QuestionArea({ questionAreaProps }) {
                   <h3>{questionText}</h3>
                   {questionsOptionsArr[0].map((option,index) => (
                     <div className='quesOptions'>
-                      <label className={`quesOpt ${!questionAreaVisible ? 'loading' : ""}`} htmlFor={`${index+1}-${currentQuestionNo}`} key={option}>
+                      <label className={`quesOpt ${!questionAreaVisible ? 'loading' : ""}`} htmlFor={`${index+1}-${currentQuestionId}`} key={option}>
                         {isStrikeItems[index] && isVisible && (
                           <div className="optStrike"></div>
                         )}
                         <div className="perseusInteractive">
                           <Input
                             type="radio"
-                            id={`${index + 1}-${currentQuestionNo}`}
-                            name={`${currentQuestionNo}`}
+                            id={`${index + 1}-${currentQuestionId}`}
+                            name={`${currentQuestionId}`}
                             // Here we can manage checkbox states as needed
                             value={index+1}
                             checked={selectedAnswers[currentQuestionNo] === index+1 && !isStrikeItems[index]}
@@ -195,8 +205,7 @@ export default function QuestionArea({ questionAreaProps }) {
               )}
             </div>
           )}
-        </div>
-      </form>
+        </div> 
       <div>
         <Footer
           onSubmit={handleSubmit}
