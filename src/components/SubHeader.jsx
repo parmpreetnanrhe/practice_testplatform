@@ -3,7 +3,7 @@ import { Button } from './Button';
 import { Headings } from './Headings';
 import { TestInfoContext } from '../contexts/TestInfoContext';
 
-export default function SubHeader({ testTimeStarts ,currentQuestionCount }) {
+export default function SubHeader({ testTimeStarts ,currentQuestionCount,showCalc }) {
 const TestInfoData = useContext(TestInfoContext);  
 
   return (
@@ -41,7 +41,7 @@ const TestInfoData = useContext(TestInfoContext);
           type="button"
           title="Calculator"
           className="commonBtn iconBtn"
-          onClick={() => console.log("Submit clicked!")}
+          onClick={() => showCalc()}
         >
           <img
             src={`${process.env.PUBLIC_URL}/img/calcIcon.svg`}
