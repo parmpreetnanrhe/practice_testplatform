@@ -1,0 +1,59 @@
+ 
+.modalBox, .modalBoxTestPlatform {
+    position: fixed;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    top: 0px;
+    left: 0px;
+    background: var(--colour11);
+    display: flex;
+    height: 100vh;
+    z-index: 9;
+}
+
+.modalContent, .modalBoxTestPlatformContent {
+    width: 40%;
+    /* margin: 50px auto; */
+    background-color: var(--colour33);
+    border-radius: 5px;
+    display: block;
+    padding: 10px;
+}
+
+.modalContent .modalHeader, .modalBoxTestPlatformContent .modalHeaderTestPlatform {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0px 0px 15px 0px;
+    border-bottom: 1px solid;
+}
+
+.modalContent .modalBody, .modalBoxTestPlatformContent .modalBodyTestPlatform {
+    width: 100%;
+    display: block;
+    align-items: center;
+    padding: 15px 0px;
+    cursor: text;
+    flex-wrap: wrap;
+}
+
+.modalContent .modalFooter, .modalBoxTestPlatformContent .modalFooterTestPlatform {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn, .headerButtons .btn {
+    border: none;
+    position: relative;
+    background: var(--colour13);
+    color: var(--whiteColor);
+    padding: 3px 15px;
+    font-size: inherit;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}

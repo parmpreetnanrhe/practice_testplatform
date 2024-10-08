@@ -27,14 +27,13 @@ export const PracticeQuePalletApi = async (payLoads) => {
   try {
     const response = await axios.post(
       'app/api/practiceQuePalletApiGeneric.php',
-      payload,
+      queryString,
       {
         method: 'POST',
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
           "Access-Control-Allow-Origin": "*",
-        },
-        body: queryString,
+        }, 
       }
     );
     return response.data;

@@ -97,6 +97,7 @@ body {
   display: flex;
   align-items: center;
   outline: none;
+  justify-content: center;
 }
 
 .pallet-button-move {
@@ -319,6 +320,7 @@ body::-webkit-scrollbar-thumb:hover {
   color: white;  
   border-radius: 5px 0 0 5px;
   text-align: center;
+  line-height: 2.5;
 }
  
 .abc-badging {

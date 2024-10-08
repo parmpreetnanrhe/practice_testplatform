@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-export const SubmitApi = async (payLoads) => {
+export const SubmitApi = async (questionsDataLoadedArr) => {
+  const jsonString = JSON.stringify(questionsDataLoadedArr);
+  const encodedData = btoa(jsonString);
   const payload = {
     dev: 10,
     platform: "android",
@@ -12,11 +14,11 @@ export const SubmitApi = async (payLoads) => {
     device_details: "MANUFACTURER=samsung MODEL=SM-E225F RELEASE=13 SDK=TIRAMISUDevice Id TP1A.220624.014",
     user_type: 0,
     user_idd: 496956,
-    user_id: 496956,
+    user_id: 496956, 
     beta_idd: 496956,
     beta_id: 496956,
     cms_id: 496956,
-    payLoads // Adding payLoads dynamically to the payload
+    encodedData
   };
   const queryString = Object.keys(payload)
     .map(key => `${key}=${payload[key]}`)
@@ -25,14 +27,13 @@ export const SubmitApi = async (payLoads) => {
   try {
     const response = await axios.post(
       '/app/api/practiceQueSubmitApiGeneric.php',
-       payload,
+      queryString, 
       {
         method: 'POST',
         headers: {
           "Content-Type": "application/x-www-form-urlencoded", // or 'application/json' if the server expects JSON
           "Access-Control-Allow-Origin": "*",
-        },
-        body: queryString,
+        }, 
       }
     );
     // Return the data instead of setting state

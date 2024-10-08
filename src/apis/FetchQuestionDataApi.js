@@ -25,14 +25,13 @@ export const FetchQuestionDataApi = async (payLoads) => {
   try {
     const response = await axios.post(
       '/app/api/practiceQueDataFetchApiGeneric.php',
-       payload,
+      queryString,
       {
         method: 'POST',
         headers: {
           "Content-Type": "application/x-www-form-urlencoded", // or 'application/json' if the server expects JSON
           "Access-Control-Allow-Origin": "*",
-        },
-        body: queryString,
+        }, 
       }
     );
     // Return the data instead of setting state
