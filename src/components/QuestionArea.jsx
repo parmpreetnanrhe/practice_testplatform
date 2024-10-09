@@ -19,11 +19,11 @@ export default function QuestionArea({ questionAreaProps }) {
     palletQuestionBoxData,
     questionAreaVisible,
   } = questionAreaProps;
-  console.log('palletQuestionBoxData', palletQuestionBoxData)
+  // console.log('palletQuestionBoxData', palletQuestionBoxData)
   const currentQuestionIndex = useRef(); // useRef, it persists the value across renders without causing a re-render.it will not trigger a re-render when updated.
   currentQuestionIndex.current = currentQuestionNo;
 
-  const [selectedAnswers, setSelectedAnswers] = useState(""); // Store user Answer Selection 
+  const [selectedAnswers, setSelectedAnswers] = useState(""); // Store user Answer Selection
   const [questionPassageSts, setQuestionPassageSts] = useState({
     questionPassage: "",
     qp_status: false,
@@ -43,7 +43,6 @@ export default function QuestionArea({ questionAreaProps }) {
     modalShowHideStatus: false,
     isSubmitQuestionLoader: false,
   });
-
 
   const testTimeSpentRef = useRef(0);
   const intervalRef = useRef(null); // UseRef to store the interval ID
@@ -73,7 +72,10 @@ export default function QuestionArea({ questionAreaProps }) {
 
   // handleNextClick handlePreviousClick
   const handleNextClick = () => {
-    if (currentQuestionIndex.current < palletQuestionBoxData.questionsData.length - 1) {
+    if (
+      currentQuestionIndex.current <
+      palletQuestionBoxData.questionsData.length - 1
+    ) {
       currentQuestionIndex.current += 1;
       updateQuestionData(currentQuestionIndex.current);
     }
@@ -87,7 +89,8 @@ export default function QuestionArea({ questionAreaProps }) {
   };
 
   const updateQuestionData = (currentQuestionIndexVal) => {
-    const dataLoaded = palletQuestionBoxData.questionsData[currentQuestionIndexVal];
+    const dataLoaded =
+      palletQuestionBoxData.questionsData[currentQuestionIndexVal];
     handleQuestionClick(dataLoaded.platformLink, currentQuestionIndexVal);
   };
 
@@ -115,7 +118,7 @@ export default function QuestionArea({ questionAreaProps }) {
       if (base64EncodedQuestionPassage != "") {
         setQuestionPassageSts({
           questionPassage: decryptPassword(atob(base64EncodedQuestionPassage)),
-          qp_status:true
+          qp_status: true,
         });
       }
       setquestionsOptionsArr(questionsOptionsArr);
@@ -194,9 +197,8 @@ export default function QuestionArea({ questionAreaProps }) {
   const convertToLetter = (num) => {
     return String.fromCharCode(64 + num); // 'A' starts at 65 in ASCII
   };
- 
 
-  // Test Start Timer  
+  // Test Start Timer
   const saveAnnotate = () => {
     setIsOpenAnnotate(false);
     const mark = document.querySelector("mark.active");
@@ -223,17 +225,16 @@ export default function QuestionArea({ questionAreaProps }) {
   useEffect(() => {
     // Start the timer
     intervalRef.current = setInterval(() => {
-      testTimeSpentRef.current += 1; 
+      testTimeSpentRef.current += 1;
     }, 1000);
-
 
     // Clean up the interval on component unmount
     return () => {
       clearInterval(intervalRef.current);
     };
-  }, []);
-  
-   useEffect(() => {
+  }, [testTimeSpentRef.current]);
+
+  useEffect(() => {
     setTimeout(() => {
       const marks = document.querySelectorAll("mark");
       marks.forEach((mark) => {
@@ -278,6 +279,8 @@ export default function QuestionArea({ questionAreaProps }) {
         if (parentDiv) {
           setSelectedText(selectedText);
         }
+
+        console.log("SetSelectedTxt", selectedText);
       } else {
         setSelectedText("");
       }
@@ -285,7 +288,8 @@ export default function QuestionArea({ questionAreaProps }) {
   };
 
   const annotateFunc = (selectedText) => {
-    setIsTxtSelected(false);
+    // setIsTxtSelected(false);
+
     if (selectedText && !isOpenAnnotate) {
       setSelectionNo(selectionNo + 1);
       const selection = window.getSelection();
@@ -425,14 +429,18 @@ export default function QuestionArea({ questionAreaProps }) {
       <SubHeader
         testTimeStarts={parseInt(testTimeSpentRef.current)}
         currentQuestionCount={currentQuestionNo + 1}
-        showCalc={showCalc}   
+        showCalc={showCalc}
         annotateFunc={annotateFunc}
         selectedText={selectedText}
         isTxtSelected={isTxtSelected}
         annotateRef={annotateRef}
       />
       <div className="question-main-container">
-        {questionPassageSts.qp_status && <LeftQuestionArea passageContent={questionPassageSts.questionPassage}/>}
+        {questionPassageSts.qp_status && (
+          <LeftQuestionArea
+            passageContent={questionPassageSts.questionPassage}
+          />
+        )}
         {questionText && (
           <div
             className={`question-container ${
@@ -445,7 +453,9 @@ export default function QuestionArea({ questionAreaProps }) {
             />
             {questionText && (
               <div className="single-question">
-                <h3>{parse(questionText)}</h3>
+                <h3 onMouseUp={SetSelectedTxt} className="makeselection">
+                  {parse(questionText)}
+                </h3>
                 {questionsOptionsArr.length > 0 &&
                   questionsOptionsArr.map((optionsArr, arrIndex) =>
                     optionsArr.map((option, index) => (
@@ -507,7 +517,6 @@ export default function QuestionArea({ questionAreaProps }) {
           </div>
         )}
       </div>
-  
 
       <div>
         <Footer

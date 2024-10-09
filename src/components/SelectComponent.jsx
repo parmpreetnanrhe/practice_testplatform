@@ -23,20 +23,11 @@ const SelectComponent = ({
     setIsOpen(!isOpen);
   };
 
-  // Close dropdown when clicking outside of it
   const handleClickOutside = (event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
       setIsOpen(false);
     }
   };
-
-  // Attach and remove the event listener to handle clicks outside
-  // useEffect(() => {
-  //   document.addEventListener("mousedown", handleClickOutside);
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   };
-  // }, []);
 
   return (
     <>
@@ -48,20 +39,36 @@ const SelectComponent = ({
         <div className="selectedVal">{selectedValue}</div>
         {isOpen && (
           <div className="selectItems">
-            {options.map((option, index) => (
-              <div className="selectOptions" key={option.cateId}>
-                <h1>{option.label}</h1>
-                {option.subCatArr.map((data,index) => (
-                  <div
-                    onClick={() => handleOptionClick(data)}
-                    key={index}
-                    className="optionItem"
-                    value={data.cateId}
-                    link = {data.link}
-                  >{data.name}</div>
-                ))}
-              </div>
-            ))}
+            {options.map((option, index) => {
+              // Check if the subCatArr exists and has items
+              if (option.subCatArr && option.subCatArr.length > 0) {
+                return (
+                  <div className="selectOptions" key={option.cateId}>
+                    <h1>{option.label}</h1>
+                    {option.subCatArr.map((data, subIndex) => (
+                      <div
+                        onClick={() => handleOptionClick(data)}
+                        key={subIndex}
+                        className="optionItem"
+                        value={data.cateId}
+                        link={data.link}
+                      >
+                        {data.name}
+                      </div>
+                    ))}
+                  </div>
+                );
+              } else {
+                // Render this if subCatArr is empty or doesn't exist
+                return (
+                  <div className="selectOptions" key={option.cateId}> 
+                    <div className="optionItem" key={index}>
+                      {option.label}
+                    </div>
+                  </div>
+                );
+              }
+            })}
           </div>
         )}
       </div>

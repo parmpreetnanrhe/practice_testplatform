@@ -408,9 +408,9 @@ body::-webkit-scrollbar-thumb:hover {
   background-repeat: repeat-x;
 }
 
-.selectItems .optionItem:last-child {
+/* .selectItems .optionItem:last-child {
   background: none;
-}
+} */
 
 .quesOpt {
   display: flex;
@@ -432,14 +432,14 @@ body::-webkit-scrollbar-thumb:hover {
 }
 
 span.optionTxt {
-  color: #333;
+  color: var(--textColor);
   line-height: 24px;
 }
 
 .single-question h3 {
   font-size: 1.125rem;
   font-weight: 400;
-  color: #333;
+  color: var(--textColor);
   line-height: 1.688rem;
   margin: 1.5rem 0 1.5rem 0;
 }
