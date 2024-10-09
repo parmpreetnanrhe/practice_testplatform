@@ -226,6 +226,7 @@ body::-webkit-scrollbar-thumb:hover {
   display: flex;
   justify-content: end;
   gap: 1rem;
+  position: relative;
 }
 
 .subHeaderIconBar .iconBtn {
@@ -293,7 +294,7 @@ body::-webkit-scrollbar-thumb:hover {
 
 
 .question-main-container {
-  height: calc(100svh - 10.98rem);
+  height: calc(100vh - 10.98rem);
   padding: 1.25rem;
   overflow: auto;
   display: flex; 

@@ -1,0 +1,45 @@
+.calcModal {
+  position: absolute;
+  background: #2A404B;
+  width: 30%;
+  top: 4rem;
+  height: 80vh;
+  box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.30);
+  border-radius: 3px;
+  z-index: 9;
+}
+
+.calcModal .modal-content {
+  height: calc(100% - 2.125rem);
+}
+
+.calcHeader {
+  display: flex;
+  /* grid-template-columns: repeat(3, minmax(0, 1fr)); */
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+}
+
+.calcModal .title {
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 0.900rem;
+}
+
+.dragTitle {
+  text-align: center;
+}
+
+.calcModal .expendClose {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.calcModal .modal-content {
+  height: calc(100% - 2.125rem);
+}
+
+.calcModal .expendClose img, .dragTitle img {
+  cursor: pointer;
+}
