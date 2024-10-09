@@ -8,6 +8,8 @@ import SubHeader from "./SubHeader";
 import { SubmitApi } from "../apis/SubmitApi";
 import AlertModal from "./modalComponent/AlertModal";
 import FullScreenLoader from "./modalComponent/FullScreenLoader";
+import parse from "html-react-parser";
+import LeftQuestionArea from "./LeftQuestionArea";
 export default function QuestionArea({ questionAreaProps }) {
   const {
     questionsDataLoaded,
@@ -16,12 +18,16 @@ export default function QuestionArea({ questionAreaProps }) {
     palletQuestionBoxData,
     questionAreaVisible,
   } = questionAreaProps;
-
+  console.log('palletQuestionBoxData', palletQuestionBoxData)
   const currentQuestionIndex = useRef(); // useRef, it persists the value across renders without causing a re-render.it will not trigger a re-render when updated.
   currentQuestionIndex.current = currentQuestionNo;
 
   const [selectedAnswers, setSelectedAnswers] = useState(""); // Store user Answer Selection
   const [questionText, setQuestionText] = useState("");
+  const [questionPassageSts, setQuestionPassageSts] = useState({
+    questionPassage: "",
+    qp_status: false,
+  });
   const [questionsOptionsArr, setquestionsOptionsArr] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
   const [isStrikeItems, setIsStrike] = useState({});
@@ -33,6 +39,10 @@ export default function QuestionArea({ questionAreaProps }) {
     modalShowHideStatus: false,
     isSubmitQuestionLoader: false,
   });
+
+
+  const testTimeSpentRef = useRef(0);
+  const intervalRef = useRef(null); // UseRef to store the interval ID
 
   // Toggle the visibility of SecondComponent
   const handleToggleVisibility = () => {
@@ -50,7 +60,7 @@ export default function QuestionArea({ questionAreaProps }) {
 
   // handleNextClick handlePreviousClick
   const handleNextClick = () => {
-    if (currentQuestionIndex.current < palletQuestionBoxData.length - 1) {
+    if (currentQuestionIndex.current < palletQuestionBoxData.questionsData.length - 1) {
       currentQuestionIndex.current += 1;
       updateQuestionData(currentQuestionIndex.current);
     }
@@ -64,7 +74,7 @@ export default function QuestionArea({ questionAreaProps }) {
   };
 
   const updateQuestionData = (currentQuestionIndexVal) => {
-    const dataLoaded = palletQuestionBoxData[currentQuestionIndexVal];
+    const dataLoaded = palletQuestionBoxData.questionsData[currentQuestionIndexVal];
     handleQuestionClick(dataLoaded.platformLink, currentQuestionIndexVal);
   };
 
@@ -84,10 +94,17 @@ export default function QuestionArea({ questionAreaProps }) {
         });
       });
       let base64EncodedText = quesArray.questionText;
+      let base64EncodedQuestionPassage = quesArray.questionPassage;
       let questionsOptionsArr = quesArray.questionsOptions;
       let decodedQuestionText = decryptPassword(atob(base64EncodedText));
       setCurrentQuestionId(quesArray.questionId);
       setQuestionText(decodedQuestionText);
+      if (base64EncodedQuestionPassage != "") {
+        setQuestionPassageSts({
+          questionPassage: decryptPassword(atob(base64EncodedQuestionPassage)),
+          qp_status:true
+        });
+      }
       setquestionsOptionsArr(questionsOptionsArr);
       console.log(questionsOptionsArr);
     }
@@ -100,11 +117,11 @@ export default function QuestionArea({ questionAreaProps }) {
         return {
           ...question,
           answerGiven: selectedAnswers,
-          testTimeSpent: testTimeSpent,
+          testTimeSpent: testTimeSpentRef.current,
         };
       });
     });
-    console.log(questionsDataLoaded.testData.sectionsData[0])
+    console.log(questionsDataLoaded.testData.sectionsData[0]);
     handleQuestionSubmit(questionsDataLoaded);
   };
 
@@ -164,17 +181,13 @@ export default function QuestionArea({ questionAreaProps }) {
   const convertToLetter = (num) => {
     return String.fromCharCode(64 + num); // 'A' starts at 65 in ASCII
   };
-
-  const [testTimeSpent, setTestTimeSpent] = useState(1);
-  const testTimeSpentRef = useRef(0);
-  const intervalRef = useRef(null); // UseRef to store the interval ID
+ 
 
   // Test Start Timer
   useEffect(() => {
     // Start the timer
     intervalRef.current = setInterval(() => {
-      testTimeSpentRef.current += 1;
-      setTestTimeSpent(testTimeSpentRef.current) 
+      testTimeSpentRef.current += 1; 
     }, 1000);
 
     // Clean up the interval on component unmount
@@ -199,6 +212,7 @@ export default function QuestionArea({ questionAreaProps }) {
         showCalc={showCalc}
       />
       <div className="question-main-container">
+        {questionPassageSts.qp_status && <LeftQuestionArea passageContent={questionPassageSts.questionPassage}/>}
         {questionText && (
           <div
             className={`question-container ${
@@ -211,7 +225,7 @@ export default function QuestionArea({ questionAreaProps }) {
             />
             {questionText && (
               <div className="single-question">
-                <h3>{questionText}</h3>
+                <h3>{parse(questionText)}</h3>
                 {questionsOptionsArr.length > 0 &&
                   questionsOptionsArr.map((optionsArr, arrIndex) =>
                     optionsArr.map((option, index) => (
@@ -248,7 +262,7 @@ export default function QuestionArea({ questionAreaProps }) {
                             </span>
                           </div>
                           <span className="optionTxt">
-                            {decryptPassword(atob(optionsArr[index]))}
+                            {parse(decryptPassword(atob(optionsArr[index])))}
                           </span>
                         </label>
                         {isVisible && (
@@ -282,7 +296,7 @@ export default function QuestionArea({ questionAreaProps }) {
             questionAreaVisible ? () => handleAnalysisClick() : null
           }
           currentQuestionIndex={currentQuestionIndex}
-          totalQuestions={palletQuestionBoxData.length}
+          totalQuestions={palletQuestionBoxData.questionsData.length}
           // totalQuestions={questionsDataLoaded.length}
         />
         {isSubmit.modalShowHideStatus && (

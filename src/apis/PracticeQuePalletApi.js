@@ -19,6 +19,7 @@ export const PracticeQuePalletApi = async (payLoads) => {
     beta_idd: 496956,
     beta_id: 496956,
     cms_id: 496956,
+    sortingType:"ascending"
   };
   const queryString = Object.keys(payload)
     .map(key => `${key}=${payload[key]}`)

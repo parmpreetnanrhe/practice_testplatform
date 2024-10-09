@@ -49,11 +49,11 @@
 .btn, .headerButtons .btn {
     border: none;
     position: relative;
-    background: var(--colour13);
+    background: var(--colour44);
     color: var(--whiteColor);
     padding: 3px 15px;
     font-size: inherit;
     margin: 5px;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
 }

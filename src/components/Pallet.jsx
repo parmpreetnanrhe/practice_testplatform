@@ -5,24 +5,25 @@ import { PracticeQuesPallet } from "../contexts/PracticeQuesPalletContext";
 import QuestionArea from "./QuestionArea";
 import { FetchQuestionDataApi } from "../apis/FetchQuestionDataApi";
 import FullScreenLoader from "./modalComponent/FullScreenLoader";
+import { PracticeQuePalletApi } from "../apis/PracticeQuePalletApi";
 
 export default function Pallet() {
-  console.log("pallet Component calling....")
+  console.log("pallet Component calling....");
   const [questionsDataLoaded, setQuestionsDataLoaded] = useState([]);
   const [currentQuestionNo, setCurrentQuestionNo] = useState(0);
   const [categoryNamesArray, setCategoryNamesArray] = useState([]);
-  const [palletQuestionBoxData, setPalletQuestionBoxData] = useState([]);
   const [questionAreaVisible, setQuestionAreaVisible] = useState(false);
   const [showScreenLoader, setShowScreenLoader] = useState(true);
   const [isPalletOpen, setIsPalletOpen] = useState(true);
-  const [disabled, setDisabled] = useState(false); 
-  const [loaderText,setLoaderText] = useState("");
+  const [disabled, setDisabled] = useState(false);
+  const [loaderText, setLoaderText] = useState({
+    loaderShowHide: false,
+    loaderText: "",
+  });
   // pallet data coming from context
-  const palletData = useContext(PracticeQuesPallet);
-  const pQuesData = palletData.palletQueData;
-  const loading = palletData.loading;
-  const handlePalletQuestionsLoad = palletData.handlePalletLoadApi;
-  console.log(loading);
+  const [palletQuestionBoxData, setPalletQuestionBoxData] = useState([]);
+  const [palletLoading,setPalletLoading] = useState(true);
+  // const handlePalletQuestionsLoad = palletData.handlePalletLoadApi;
 
   const optionsArray = [
     "All",
@@ -47,10 +48,13 @@ export default function Pallet() {
     setIsPalletOpen(false);
     setQuestionAreaVisible(false);
     setShowScreenLoader(true);
-    setLoaderText("Please wait while we are loading...");
+    setLoaderText({
+      loaderShowHide: true,
+      loaderText: "Please wait while we are loading...",
+    });
     await FetchQuestionDataApi(platformLink, questionNo)
       .then((data) => {
-        if(data.success == 0){
+        if (data.success == 0) {
           alert("Something went wrong Pallet API!");
         }
         setQuestionsDataLoaded(data);
@@ -62,47 +66,71 @@ export default function Pallet() {
       .catch((error) => console.error("Error fetching question data:", error));
   };
 
-  const [selectedCategory, setSelectedCategory] = useState(''); 
-  const handlePalletDataLoad = (selectedValue) =>{
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const handlePalletDataLoad = async (selectedValue) => {
+    setQuestionAreaVisible(false);
     setShowScreenLoader(true);
-    palletData.setLoading(true);
-    const payLoads = "Y2twbGZPaHpgcG56fDokIiUjOCEvZHRmcE52PD8kOCMkMD98em17ekl+bGFxOiU0ZGZtYX1uenxmRXdtYXpvR3s+an9rbWJna3Ane2p1YXt7dFxreWIoc2Zkd29qfWZ0MmVwY3ppe1p8Z2Q1ZGt5NHR5aWpbYmRncHRmPD8=";
-    handlePalletQuestionsLoad(payLoads);
+    setPalletLoading(true);
+    setLoaderText((prev)=>({ 
+      ...prev,
+      loaderShowHide: false,
+      loaderText: "",
+    }));
+    setPalletQuestionBoxData([]);
+    const payLoads = selectedValue;
+    handlePalletLoadApi(payLoads);
     setSelectedCategory(selectedValue);
-    console.log("Selected value from dropdown: ", selectedValue); 
-  }
+    console.log("Selected value from dropdown: ", selectedValue);
+  };
+
+  const handlePalletLoadApi = async (payLoads) => {
+    await PracticeQuePalletApi(payLoads)
+      .then((data) => {
+        if (data.success == 0) {
+          alert("Something went wrong in pallet API!");
+        } else {
+          setPalletQuestionBoxData(data);
+          if (data && data.categoryNamesArray) {
+            const categoriesWithSubCats = data.categoryNamesArray.filter(
+              (category) => category.subCats && category.subCats.length > 0
+            );
+            const categories = categoriesWithSubCats.map((data) => ({
+              value: data.cateId,
+              label: data.name,
+              subCatArr: data.subCats,
+            }));
+            setCategoryNamesArray(categories);
+            setPalletLoading(false);
+          }
+        }
+      })
+      .catch((error) => console.error("Error fetching question data:", error));
+  };
 
   useEffect(() => {
-    setPalletQuestionBoxData(pQuesData.questionsData);
-    if (pQuesData && pQuesData.categoryNamesArray) {
-      const categoriesWithSubCats = pQuesData.categoryNamesArray.filter(
-        (category) => category.subCats && category.subCats.length > 0
-      );
-      const categories = categoriesWithSubCats.map((data) => ({
-        value: data.cateId,
-        label: data.name,
-      }));
-      setCategoryNamesArray(categories);
-    }
-  }, [pQuesData]);
-
+    const payLoads =
+      "Y2twbGZPaHpgcG56fDokIiUjOCEvZHRmcE52PD8kOCMkMD98em17ekl+bGFxOiU0ZGZtYX1uenxmRXdtYXpvR3s+an9rbWJna3Ane2p1YXt7dFxreWIoc2Zkd29qfWZ0MmVwY3ppe1p8Z2Q1ZGt5NHR5aWpbYmRncHRmPD8=";
+    handlePalletLoadApi(payLoads);
+  }, []);
+  console.log("categoryNamesArray", categoryNamesArray);
   return (
     <>
-      {questionAreaVisible && ( 
-          <QuestionArea
-            questionAreaProps={{
-              questionsDataLoaded,
-              currentQuestionNo,
-              handleQuestionClick,
-              palletQuestionBoxData,
-              questionAreaVisible,
-            }}
-          /> 
+      {questionAreaVisible && (
+        <QuestionArea
+          questionAreaProps={{
+            questionsDataLoaded,
+            currentQuestionNo,
+            handleQuestionClick,
+            palletQuestionBoxData,
+            questionAreaVisible,
+          }}
+        />
       )}
-      
+
       {showScreenLoader && (
         <FullScreenLoader
-          text={loaderText}
+          loaderShowHide={loaderText.loaderShowHide}
+          text={loaderText.loaderText}
         />
       )}
 
@@ -131,18 +159,19 @@ export default function Pallet() {
             options={categoryNamesArray}
             onSelectChange={handlePalletDataLoad}
             defaultText="Please select a value"
-            className={`${loading ? "loading" : ""}`}
+            className={`${palletLoading ? "loading" : ""}`}
           />
           <SelectComponent
             options={options2}
             onSelectChange=""
             defaultText="Please select a value"
-            className={`${loading ? "loading" : ""}`}
+            className={`${palletLoading ? "loading" : ""}`}
           />
         </div>
         <div className={`question-box-container`}>
-          {palletQuestionBoxData && palletQuestionBoxData.length > 0
-            ? palletQuestionBoxData.map((queData, index) => (
+          {palletQuestionBoxData.questionsData &&
+          palletQuestionBoxData.questionsData.length > 0
+            ? palletQuestionBoxData.questionsData.map((queData, index) => (
                 <div
                   key={queData.questionId}
                   className={`ques-box ${
@@ -169,10 +198,7 @@ export default function Pallet() {
             : Array(55)
                 .fill()
                 .map((_, i) => (
-                  <div
-                    key={i}
-                    className="ques-box loading"
-                  >
+                  <div key={i} className="ques-box loading">
                     <span>{i + 1}</span> {/* Displaying 1 to 56 */}
                   </div>
                 ))}

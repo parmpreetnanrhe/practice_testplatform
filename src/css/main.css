@@ -53,7 +53,7 @@ body {
 }
 
 .commonBtn {
-  background: #4e9bcc;
+  background: var(--colour44);;
   border: none;
   color: #ffffff;
   border-radius: 4px;
@@ -63,8 +63,7 @@ body {
   cursor: pointer;
 }
 
-.single-question {
-  margin: 0.625rem 0;
+.single-question { 
   display: inline-block;
   width: 100%;
 }
@@ -88,7 +87,7 @@ body {
 }
 
 .pallet-button button {
-  background-color: #006eae;
+  background-color: var(--colour44);;
   width: 20px;
   height: 30px;
   color: white;
@@ -200,14 +199,17 @@ body::-webkit-scrollbar-thumb:hover {
 .question-box-container .ques-box {
   height: 2.375rem;
   border-radius: 4px;
-  text-align: center;
-  font-size: 13px;
+  text-align: center; 
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0px 1px 3px 1px rgba(0,0,0,0.20);
   color: #636060;
+}
+
+.ques-box span{ 
+  font-size: 0.875rem;
 }
 
 .question-box-container .ques-box.quesActive {
@@ -232,7 +234,6 @@ body::-webkit-scrollbar-thumb:hover {
   padding: 0;
   background: transparent;
   color: #636060;
-  font-size: 0.75rem;
   gap: 0.5rem;
 }
 
@@ -240,26 +241,25 @@ body::-webkit-scrollbar-thumb:hover {
   margin: auto;
 }
 
-.timerTitle {
-  margin: 0;
-}
 
 .subHeaderIconBar .iconBtn span {
-  line-height: 1.3;
+  line-height: 1.3; 
+  font-size: 0.75rem;
 }
 
 .timerTitle {
   margin: 0;
   text-align: center;
+  font-size: 1.5rem;
   color: #636060;
 }
 
 .commonBtn.submitBtn {
-  background: #006eae;
+  background: var(--colour44);;
 }
 
 .commonBtn.submitBtn {
-  background: #006eae;
+  background: var(--colour44);
   padding: 0rem 1.5rem;
   font-size: 1rem;
 }
@@ -296,16 +296,16 @@ body::-webkit-scrollbar-thumb:hover {
   height: calc(100svh - 10.98rem);
   padding: 1.25rem;
   overflow: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: flex; 
+  justify-content: center;
 }
 .question-container{
   width: 50%;
+  padding: 0.8rem;
 }
 
 .question-header{ 
-  background-color: #e5e5e5; 
+  background-color: var(--colour43); 
   height: 2.5rem;
   display: flex;
   justify-content: space-between;
@@ -359,8 +359,7 @@ body::-webkit-scrollbar-thumb:hover {
   margin-bottom: 0.625rem;
   color: #636060;
   border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.875rem;
+  cursor: pointer; 
 }
 
 .selectItems {
@@ -393,6 +392,7 @@ body::-webkit-scrollbar-thumb:hover {
   overflow: hidden;
   text-overflow: ellipsis;
   padding-right: 1.2rem;
+  font-size: 0.875rem;
 }
 
 .selectItems .optionItem {
@@ -431,7 +431,6 @@ body::-webkit-scrollbar-thumb:hover {
 }
 
 span.optionTxt {
-  font-size: 18px;
   color: #333;
   line-height: 24px;
 }
@@ -441,6 +440,7 @@ span.optionTxt {
   font-weight: 400;
   color: #333;
   line-height: 1.688rem;
+  margin: 1.5rem 0 1.5rem 0;
 }
 
 .perseusInteractive input {display: none;}
@@ -478,8 +478,7 @@ span.iconWrapper {
 /* Add an icon on hover */
 .quesBoxDisabled::after {
   content: '\f05e';           /* FontAwesome exclamation-circle icon (example) */
-  font-family: 'FontAwesome';
-  font-size: 20px;            /* Adjust icon size */
+  font-family: 'FontAwesome'; 
   color: #a9a9a9;             /* Gray color for the icon */
   position: absolute;
   top: 50%;
@@ -496,6 +495,13 @@ span.iconWrapper {
 
 div.loading{
   position: relative;
+}
+
+.selectOptions{
+  padding: .5rem
+}
+.selectOptions div{
+  padding: .5rem;
 }
 
 div.loading::after {
@@ -592,5 +598,12 @@ span.undoCls {
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #006eae; 
+  background: var(--colour44);
+}
+
+.left-question-area{
+  width: 50%;
+  border-right: 5px solid ;
+  border-color: var(--colour43);
+  padding: 0.8rem;
 }
