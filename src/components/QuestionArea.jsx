@@ -257,32 +257,36 @@ export default function QuestionArea({ questionAreaProps }) {
   };
 
   const SetSelectedTxt = () => {
-    const selection = window.getSelection();
-    const selectedText = selection.toString();
+    if (!isOpenAnnotate) {
+      const selection = window.getSelection();
+      const selectedText = selection.toString();
 
-    if (selectedText) {
-      const range = selection.getRangeAt(0);
-      let selectedNode = range.commonAncestorContainer;
+      if (selectedText) {
+        const range = selection.getRangeAt(0);
+        let selectedNode = range.commonAncestorContainer;
 
-      // Walk up the DOM tree until we find an element with class 'makeselection'
-      let parentDiv =
-        selectedNode.nodeType === 3 ? selectedNode.parentElement : selectedNode;
+        // Walk up the DOM tree until we find an element with class 'makeselection'
+        let parentDiv =
+          selectedNode.nodeType === 3
+            ? selectedNode.parentElement
+            : selectedNode;
 
-      while (parentDiv && !parentDiv.classList.contains("makeselection")) {
-        parentDiv = parentDiv.parentElement;
+        while (parentDiv && !parentDiv.classList.contains("makeselection")) {
+          parentDiv = parentDiv.parentElement;
+        }
+        // If we found the div with 'makeselection' class, set the selected text
+        if (parentDiv) {
+          setSelectedText(selectedText);
+        }
+      } else {
+        setSelectedText("");
       }
-      // If we found the div with 'makeselection' class, set the selected text
-      if (parentDiv) {
-        setSelectedText(selectedText);
-      }
-    } else {
-      setSelectedText("");
     }
   };
 
   const annotateFunc = (selectedText) => {
     setIsTxtSelected(false);
-    if (selectedText) {
+    if (selectedText && !isOpenAnnotate) {
       setSelectionNo(selectionNo + 1);
       const selection = window.getSelection();
       var range = selection.getRangeAt(0);
@@ -405,14 +409,14 @@ export default function QuestionArea({ questionAreaProps }) {
 
       // Move all children of the mark element to the parent
       while (mark.firstChild) {
-          parent.insertBefore(mark.firstChild, mark);
+        parent.insertBefore(mark.firstChild, mark);
       }
 
       // Remove the mark element itself
       parent.removeChild(mark);
     }
-    setTextAreaValue('');
-  }
+    setTextAreaValue("");
+  };
 
   const handleAnalysisClick = () => {};
 
