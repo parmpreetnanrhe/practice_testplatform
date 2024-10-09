@@ -1,10 +1,10 @@
 import React from 'react';
 import { Button } from './Button';
 
-export const Footer = ({ onSubmit, onPrevious, onNext, currentQuestionIndex, totalQuestions }) => {
+export const Footer = ({ onSubmit, onPrevious, onNext, onClickAnalysis, currentQuestionIndex, totalQuestions }) => {
   return (
     <footer className="footer">
-      <div>
+      <div className="nxtPrevBtn">
         <Button
           type="button"
           title="Submit"
@@ -12,6 +12,14 @@ export const Footer = ({ onSubmit, onPrevious, onNext, currentQuestionIndex, tot
           onClick={onSubmit}
         >
           Submit
+        </Button>
+        <Button
+          type="button"
+          title="Submit"
+          className="commonBtn next-Btn"
+          onClick={onClickAnalysis}
+        >
+          Analysis
         </Button>
       </div>
       <div className="nxtPrevBtn">

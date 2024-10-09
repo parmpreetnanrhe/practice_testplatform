@@ -5,10 +5,9 @@ import { PracticeQuesPallet } from "../contexts/PracticeQuesPalletContext";
 import QuestionArea from "./QuestionArea";
 import { FetchQuestionDataApi } from "../apis/FetchQuestionDataApi";
 import FullScreenLoader from "./modalComponent/FullScreenLoader";
-import TestStartTimer from "./TestStartTimer";
-import TestStartTimerProvider from "./TestStartTimer";
 
-export default function Pallet({}) {
+export default function Pallet() {
+  console.log("pallet Component calling....")
   const [questionsDataLoaded, setQuestionsDataLoaded] = useState([]);
   const [currentQuestionNo, setCurrentQuestionNo] = useState(0);
   const [categoryNamesArray, setCategoryNamesArray] = useState([]);
@@ -16,7 +15,7 @@ export default function Pallet({}) {
   const [questionAreaVisible, setQuestionAreaVisible] = useState(false);
   const [showScreenLoader, setShowScreenLoader] = useState(true);
   const [isPalletOpen, setIsPalletOpen] = useState(true);
-  const [disabled, setDisabled] = useState(false);
+  const [disabled, setDisabled] = useState(false); 
   const [loaderText,setLoaderText] = useState("");
   // pallet data coming from context
   const palletData = useContext(PracticeQuesPallet);

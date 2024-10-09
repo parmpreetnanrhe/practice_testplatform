@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const SubmitApi = async (questionsDataLoadedArr) => {
   const jsonString = JSON.stringify(questionsDataLoadedArr);
-  const encodedData = btoa(jsonString);
+  const payLoads = btoa(jsonString);
   const payload = {
     dev: 10,
     platform: "android",
@@ -16,9 +16,9 @@ export const SubmitApi = async (questionsDataLoadedArr) => {
     user_idd: 496956,
     user_id: 496956, 
     beta_idd: 496956,
-    beta_id: 496956,
+    beta_id: 496956, 
     cms_id: 496956,
-    encodedData
+    payLoads
   };
   const queryString = Object.keys(payload)
     .map(key => `${key}=${payload[key]}`)

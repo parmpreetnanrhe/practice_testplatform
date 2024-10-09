@@ -47,6 +47,14 @@ export default function AlertModal({ message, isSubmitTest }) {
                 {" "}
                 {buttonText}
               </Button>
+              {(isSubmitTest.isSubmit.continueBtnShow) && <Button
+                type="button"
+                title="Return"
+                className="btn"
+                onClick={closeModal}
+              >
+                {"Return"} 
+              </Button>}
             </div>
           </div>
         </div>

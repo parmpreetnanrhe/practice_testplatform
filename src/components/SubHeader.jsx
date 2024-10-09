@@ -1,10 +1,32 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Button } from './Button';
 import { Headings } from './Headings';
 import { TestInfoContext } from '../contexts/TestInfoContext';
 
 export default function SubHeader({ testTimeStarts ,currentQuestionCount,showCalc }) {
 const TestInfoData = useContext(TestInfoContext);  
+
+
+const [testTimeSpent, setTestTimeSpent] = useState(testTimeStarts); 
+ 
+const intervalRef = useRef(null); // UseRef to store the interval ID
+
+// Test Start Timer 
+useEffect(() => {
+  intervalRef.current = setInterval(() => {
+    setTestTimeSpent((prevTime) => prevTime + 1);
+  }, 1000);
+  return () => clearInterval(intervalRef.current);
+}, []);
+
+
+const formatTime = (seconds) => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds} ${
+    minutes > 0 ? "min" : "sec"
+  }`;
+};
 
   return (
     <header className="sub-header">
@@ -21,7 +43,7 @@ const TestInfoData = useContext(TestInfoContext);
           type={2}
           title="Timer"
           className="timerTitle"
-          text={testTimeStarts}
+          text={formatTime(testTimeSpent)}
         />
       </div>
       <div className="subHeaderIconBar">

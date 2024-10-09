@@ -1,14 +1,13 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { Footer } from "./Footer";
-import { UserInfoAuthContext } from "../contexts/UserInfoContext";
 import { Question_heading } from "./Question_heading";
-import { QuestionDataContext } from "../contexts/QuestionDataContext";
 import { decryptPassword } from "../commonFunctions/decryptPassword";
 import CalcModal from "./modalComponent/CalcModal";
 import Input from "./Input";
 import SubHeader from "./SubHeader";
 import { SubmitApi } from "../apis/SubmitApi";
 import AlertModal from "./modalComponent/AlertModal";
+import FullScreenLoader from "./modalComponent/FullScreenLoader";
 export default function QuestionArea({ questionAreaProps }) {
   const {
     questionsDataLoaded,
@@ -22,7 +21,7 @@ export default function QuestionArea({ questionAreaProps }) {
   currentQuestionIndex.current = currentQuestionNo;
 
   const [selectedAnswers, setSelectedAnswers] = useState(""); // Store user Answer Selection
-  const [questionText, setQuestionText] = useState();
+  const [questionText, setQuestionText] = useState("");
   const [questionsOptionsArr, setquestionsOptionsArr] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
   const [isStrikeItems, setIsStrike] = useState({});
@@ -32,6 +31,7 @@ export default function QuestionArea({ questionAreaProps }) {
     continueBtnShow: false,
     continueBtnClicked: false,
     modalShowHideStatus: false,
+    isSubmitQuestionLoader: false,
   });
 
   // Toggle the visibility of SecondComponent
@@ -86,7 +86,7 @@ export default function QuestionArea({ questionAreaProps }) {
       let base64EncodedText = quesArray.questionText;
       let questionsOptionsArr = quesArray.questionsOptions;
       let decodedQuestionText = decryptPassword(atob(base64EncodedText));
-      setCurrentQuestionId(encodedString[0].questions[0].questionId);
+      setCurrentQuestionId(quesArray.questionId);
       setQuestionText(decodedQuestionText);
       setquestionsOptionsArr(questionsOptionsArr);
       console.log(questionsOptionsArr);
@@ -104,14 +104,14 @@ export default function QuestionArea({ questionAreaProps }) {
         };
       });
     });
-    console.log(questionsDataLoaded.testData.sectionsData[0].questions[0]);
-
+    console.log(questionsDataLoaded.testData.sectionsData[0])
     handleQuestionSubmit(questionsDataLoaded);
   };
 
   useEffect(() => {
     if (isSubmit.continueBtnClicked) {
       setIsSubmit((prevState) => ({
+        ...prevState,
         continueBtnShow: false,
         continueBtnClicked: false,
         modalShowHideStatus: false,
@@ -130,15 +130,23 @@ export default function QuestionArea({ questionAreaProps }) {
     }));
     console.log(isSubmit.continueBtnClicked);
     if (isSubmit.continueBtnClicked) {
+      setIsSubmit((prevState) => ({
+        ...prevState,
+        isSubmitQuestionLoader: true,
+        modalShowHideStatus: false,
+      }));
       await SubmitApi(questionsDataLoaded)
         .then((data) => {
           if (data.success == 0) {
             setIsSubmit((prevState) => ({
               ...prevState,
-              modalShowHideStatus: false,
+              isSubmitQuestionLoader: false,
             }));
           } else if (data.success == 1) {
-            alert("Test Submitted Successfully");
+            setIsSubmit((prevState) => ({
+              ...prevState,
+              isSubmitQuestionLoader: false,
+            }));
           } else {
             console.log("Something went wrong!");
           }
@@ -158,33 +166,36 @@ export default function QuestionArea({ questionAreaProps }) {
   };
 
   const [testTimeSpent, setTestTimeSpent] = useState(1);
+  const testTimeSpentRef = useRef(0);
   const intervalRef = useRef(null); // UseRef to store the interval ID
 
   // Test Start Timer
   useEffect(() => {
+    // Start the timer
     intervalRef.current = setInterval(() => {
-      setTestTimeSpent((prevTime) => prevTime + 1);
+      testTimeSpentRef.current += 1;
+      setTestTimeSpent(testTimeSpentRef.current) 
     }, 1000);
-    return () => clearInterval(intervalRef.current);
+
+    // Clean up the interval on component unmount
+    return () => {
+      clearInterval(intervalRef.current);
+    };
   }, []);
-  const formatTime = (seconds) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds} ${
-      minutes > 0 ? "min" : "sec"
-    }`;
-  };
+
   // ---------- End --------
 
   const showCalc = () => {
     setIsOpenCalc(!isOpenCalc);
   };
 
+  const handleAnalysisClick = () => {};
+
   return (
     <>
       <SubHeader
+        testTimeStarts={parseInt(testTimeSpentRef.current)}
         currentQuestionCount={currentQuestionNo + 1}
-        testTimeStarts={formatTime(testTimeSpent)}
         showCalc={showCalc}
       />
       <div className="question-main-container">
@@ -201,60 +212,62 @@ export default function QuestionArea({ questionAreaProps }) {
             {questionText && (
               <div className="single-question">
                 <h3>{questionText}</h3>
-                {questionsOptionsArr[0].map((option, index) => (
-                  <div
-                    className={`quesOptions${
-                      isStrikeItems[index] ? " strikeCls" : ""
-                    }`}
-                    key={option}
-                  >
-                    <label
-                      className={`quesOpt ${
-                        !questionAreaVisible ? "loading" : ""
-                      }`}
-                      htmlFor={`${index + 1}-${currentQuestionNo}`}
-                    >
-                      {isStrikeItems[index] && isVisible && (
-                        <div className="optStrike"></div>
-                      )}
-                      <div className="perseusInteractive">
-                        <Input
-                          type="radio"
-                          id={`${index + 1}-${currentQuestionNo}`}
-                          name={`${currentQuestionId}`}
-                          // Here we can manage checkbox states as needed
-                          value={index + 1}
-                          disabled={isStrikeItems[index]}
-                          checked={
-                            selectedAnswers === index + 1 &&
-                            !isStrikeItems[index]
-                          }
-                          onChange={() => handleCheckboxChange(index + 1)}
-                        />
-                        <span className="iconWrapper">
-                          {convertToLetter(index + 1)}
-                        </span>
-                      </div>
-                      <span className="optionTxt">
-                        {decryptPassword(atob(option))}
-                      </span>
-                    </label>
-                    {isVisible && (
+                {questionsOptionsArr.length > 0 &&
+                  questionsOptionsArr.map((optionsArr, arrIndex) =>
+                    optionsArr.map((option, index) => (
                       <div
-                        className="optDisabled"
-                        onClick={() => setStrike(index)}
+                        className={`quesOptions${
+                          isStrikeItems[index] ? " strikeCls" : ""
+                        }`}
+                        key={`${option}-${arrIndex}-${index}`} // Unique key combining option and indices
                       >
-                        {isStrikeItems[index] ? (
-                          <span className="undoCls">Undo</span>
-                        ) : (
-                          <span className="iconWrapper strikeIcon">
-                            {convertToLetter(index + 1)}
+                        <label
+                          className={`quesOpt ${
+                            !questionAreaVisible ? "loading" : ""
+                          }`}
+                          htmlFor={`${index + 1}-${currentQuestionNo}`}
+                        >
+                          {isStrikeItems[index] && isVisible && (
+                            <div className="optStrike"></div>
+                          )}
+                          <div className="perseusInteractive">
+                            <Input
+                              type="radio"
+                              id={`${index + 1}-${currentQuestionNo}`}
+                              name={`${currentQuestionId}`}
+                              value={index + 1}
+                              disabled={isStrikeItems[index]}
+                              checked={
+                                selectedAnswers === index + 1 &&
+                                !isStrikeItems[index]
+                              }
+                              onChange={() => handleCheckboxChange(index + 1)}
+                            />
+                            <span className="iconWrapper">
+                              {convertToLetter(index + 1)}
+                            </span>
+                          </div>
+                          <span className="optionTxt">
+                            {decryptPassword(atob(optionsArr[index]))}
                           </span>
+                        </label>
+                        {isVisible && (
+                          <div
+                            className="optDisabled"
+                            onClick={() => setStrike(index)}
+                          >
+                            {isStrikeItems[index] ? (
+                              <span className="undoCls">Undo</span>
+                            ) : (
+                              <span className="iconWrapper strikeIcon">
+                                {convertToLetter(index + 1)}
+                              </span>
+                            )}
+                          </div>
                         )}
                       </div>
-                    )}
-                  </div>
-                ))}
+                    ))
+                  )}
               </div>
             )}
           </div>
@@ -265,11 +278,14 @@ export default function QuestionArea({ questionAreaProps }) {
           onSubmit={handleSubmit}
           onPrevious={questionAreaVisible ? handlePreviousClick : null}
           onNext={questionAreaVisible ? () => handleNextClick() : null}
+          onClickAnalysis={
+            questionAreaVisible ? () => handleAnalysisClick() : null
+          }
           currentQuestionIndex={currentQuestionIndex}
           totalQuestions={palletQuestionBoxData.length}
           // totalQuestions={questionsDataLoaded.length}
         />
-        {isSubmit && (
+        {isSubmit.modalShowHideStatus && (
           <AlertModal
             isSubmitTest={{ isSubmit, setIsSubmit }}
             message={
@@ -279,6 +295,12 @@ export default function QuestionArea({ questionAreaProps }) {
                 later.
               </>
             }
+          />
+        )}
+        {isSubmit.isSubmitQuestionLoader && (
+          <FullScreenLoader
+            loaderShowHide={true}
+            text="Submitting yor question..."
           />
         )}
       </div>
