@@ -3,7 +3,7 @@ import { Button } from './Button';
 import { Headings } from './Headings';
 import { TestInfoContext } from '../contexts/TestInfoContext';
 
-export default function SubHeader({ testTimeStarts ,currentQuestionCount,showCalc }) {
+export default function SubHeader({ testTimeStarts, currentQuestionCount, showCalc, annotateFunc, selectedText, isTxtSelected, annotateRef }) {
 const TestInfoData = useContext(TestInfoContext);  
 
   return (
@@ -24,7 +24,7 @@ const TestInfoData = useContext(TestInfoContext);
           text={testTimeStarts}
         />
       </div>
-      <div className="subHeaderIconBar">
+      <div className="subHeaderIconBar" ref={annotateRef}>
         <Button
           type="button"
           title="Flag"
@@ -37,6 +37,7 @@ const TestInfoData = useContext(TestInfoContext);
           />
           <span>Flag</span>
         </Button>
+
         <Button
           type="button"
           title="Calculator"
@@ -52,6 +53,19 @@ const TestInfoData = useContext(TestInfoContext);
 
         <Button
           type="button"
+          title="Annotate"
+          className="commonBtn iconBtn"
+          onClick={() => annotateFunc(selectedText)}
+        >
+          <img
+            src={`${process.env.PUBLIC_URL}/img/annotateIcon.svg`}
+            alt="Annotate Icon"
+          />
+          <span>Annotate</span>
+        </Button>
+
+        <Button
+          type="button"
           title="References"
           className="commonBtn iconBtn"
           onClick={() => console.log("Submit clicked!")}
@@ -62,6 +76,14 @@ const TestInfoData = useContext(TestInfoContext);
           />
           <span>References</span>
         </Button>
+
+        {isTxtSelected && (
+          <div className='validateAnnotate'>
+            <b>Make a Selection First</b>
+            <p>Select some text, then press annotate.</p>
+          </div>
+        )}
+
       </div>
     </header>
   );
