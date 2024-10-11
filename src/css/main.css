@@ -608,3 +608,12 @@ span.undoCls {
   border-color: var(--colour43);
   padding: 0.8rem;
 }
+
+.holding {
+  cursor: grabbing; /* Cursor when holding down */
+}
+
+.style1{
+  font-size: unset !important;
+  color: var(--textColor) !important;
+}

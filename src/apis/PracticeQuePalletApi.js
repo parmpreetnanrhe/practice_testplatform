@@ -1,10 +1,15 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
+import { decryptPassword, encryptPassword } from '../commonFunctions/decryptPassword';
 
 export const PracticeQuePalletApi = async (payLoads) => { 
 
+  console.log('first1', payLoads)
+  const encryString = decryptPassword(payLoads);
+  const updatedQueryString = encryString.replace("sortingType=descending", "sortingType=ascending");   
+  const payLoadsNew = encryptPassword(updatedQueryString); 
   const payload = {
-    payLoads: payLoads,
+    payLoads: payLoadsNew,
     dev: 10,
     platform: "android",
     app_flag: 11,

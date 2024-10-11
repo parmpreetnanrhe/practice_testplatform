@@ -1,8 +1,8 @@
 /* global Desmos */
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import './CalcModal.css';
 
-export default function CalcModal({isOpen, showCalc}) {
+export default function CalcModal({ isOpen, showCalc }) {
   const calculatorRef = useRef(null); // To hold the calculator instance
   const calcContainerRef = useRef(null); // To hold the div where Desmos will be embedded
   const divRef = useRef(null);
@@ -10,10 +10,16 @@ export default function CalcModal({isOpen, showCalc}) {
 
   const [position, setPosition] = useState({ x: 0, y: 50 });
   const [dragging, setDragging] = useState(false);
-  const [expended, setExpended] = useState({expendDiv: false, width: '30%'});
+  const [expendDiv, setExpendDiv] = useState({ isExpend: false, width: '30%' });
   const [offset, setOffset] = useState({ x: 0, y: 0 });
 
+  const box = document.querySelector('.calcModal');
+
+  // Handle mouse down event to initiate dragging
   const handleMouseDown = (e) => {
+    box.classList.remove("hand"); 
+    box.classList.add('holding');
+    
     setDragging(true);
     setOffset({
       x: e.clientX - position.x,
@@ -21,20 +27,21 @@ export default function CalcModal({isOpen, showCalc}) {
     });
   };
 
-  const handleMouseMove = (e, dimensions) => {
+  // Handle mouse move event to update position during dragging
+  const handleMouseMove = (e) => {
     if (dragging) {
       const newX = e.clientX - offset.x;
       const newY = e.clientY - offset.y;
 
-      // Get viewport width and height
+      // Get viewport dimensions
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
 
-      // Get the width and height of the draggable div
-      const boxWidth = dimensions.width+10; // Replace with your box's width
-      const boxHeight = dimensions.height+10; // Replace with your box's height
+      // Get the dimensions of the modal
+      const boxWidth = dimensions.width + 10; // Box width
+      const boxHeight = dimensions.height + 10; // Box height
 
-      // Limit the position to prevent overflow (don't allow dragging out of viewport)
+      // Constrain the position within the viewport
       const constrainedX = Math.max(0, Math.min(newX, viewportWidth - boxWidth));
       const constrainedY = Math.max(0, Math.min(newY, viewportHeight - boxHeight));
 
@@ -45,8 +52,10 @@ export default function CalcModal({isOpen, showCalc}) {
     }
   };
 
-  const handleMouseUp = () => {
-    console.log('a')
+  // Handle mouse up event to stop dragging
+  const handleMouseUp = () => { 
+    box.classList.remove("holding"); 
+    box.classList.add('hand');
     setDragging(false);
   };
 
@@ -62,30 +71,29 @@ export default function CalcModal({isOpen, showCalc}) {
     });
   };
 
+  // Load Desmos calculator and update dimensions
   useEffect(() => {
     if (isOpen) {
-      console.log(divRef.current)
       const elt = calcContainerRef.current;
-      if (typeof Desmos == 'undefined') {
+      if (typeof Desmos === 'undefined') {
         loadDesmosScript()
-        .then(() => {
-          if (calcContainerRef.current) {
-            const elt = calcContainerRef.current;
-            const calculator = Desmos.GraphingCalculator(elt);
-            calculatorRef.current = calculator;
-          }
-        })
-        .catch((error) => console.error('Error loading Desmos script:', error));
+          .then(() => {
+            if (calcContainerRef.current) {
+              const calculator = Desmos.GraphingCalculator(elt);
+              calculatorRef.current = calculator;
+            }
+          })
+          .catch((error) => console.error('Error loading Desmos script:', error));
       } else {
         const calculator = Desmos.GraphingCalculator(elt);
         calculatorRef.current = calculator;
       }
 
       if (divRef.current) {
-        console.log(divRef.current.getBoundingClientRect())
         const { width, height } = divRef.current.getBoundingClientRect();
         setDimensions({ width, height });
       }
+
       return () => {
         if (calculatorRef.current) {
           calculatorRef.current.destroy(); // Clean up the calculator when the modal closes
@@ -94,43 +102,68 @@ export default function CalcModal({isOpen, showCalc}) {
     }
   }, [isOpen]);
 
-  const expendDiv = () => {
-    console.log(expended.expendDiv)
-    if (expended.expendDiv) {
-      const { expendDiv, width } = {expendDiv: false,width:'30%'}
-      setExpended({ expendDiv, width });
+  // Add event listeners for mouse move and mouse up
+  useEffect(() => {
+    if (dragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
     } else {
-      const { expendDiv, width } = {expendDiv: true,width:'70%'}
-      setExpended({ expendDiv, width });
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
     }
-  }
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [dragging]);
+
+  // Toggle expand/collapse of the modal
+  const toggleExpend = () => {
+    setExpendDiv((prev) => ({
+      isExpend: !prev.isExpend,
+      width: prev.isExpend ? '30%' : '70%',
+    }));
+  };
 
   if (!isOpen) return null; // Don't render the modal if not open
+
   return (
-    <div className="calcModal" onMouseMove={(event)=>handleMouseMove(event, dimensions)} onMouseUp={handleMouseUp} style={{left: position.x, top: position.y, width: expended.width}} ref={divRef}>
+    <div
+      className="calcModal hand"
+      onMouseDown={handleMouseDown}
+      style={{
+        left: position.x,
+        top: position.y,
+        width: expendDiv.width,
+      }}
+      ref={divRef}
+    >
       <div className="calcHeader">
         <div className="title">Calculator</div>
-        <div className="dragTitle">
-          <img onMouseDown={handleMouseDown}
-            src={`${process.env.PUBLIC_URL}/img/dragImg.svg`}
-            alt="Drag Icon"
-          />
+        <div className="dragTitle"> 
+          <div class="more-vertical">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div> 
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div> 
+          </div> 
         </div>
         <div className="expendClose">
           <img
-              onClick={()=>expendDiv()}
-              src={`${process.env.PUBLIC_URL}/img/expandImg.svg`}
-              alt="Expend Icon"
+            onClick={toggleExpend}
+            src={`${process.env.PUBLIC_URL}/img/expandImg.svg`}
+            alt="Expand Icon"
           />
           <img
-            onClick={()=>showCalc()}
+            onClick={showCalc}
             src={`${process.env.PUBLIC_URL}/img/calcCross.svg`}
-            alt="Cross Icon"
+            alt="Close Icon"
           />
         </div>
       </div>
-      <div className="modal-content" ref={calcContainerRef}>        
-      </div>
+      <div className="modal-content" ref={calcContainerRef}></div>
     </div>
   );
-};
+}

@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import "./Annotate.css";
 
 export default function Annotate({ isOpenAnnotate, selectedText, setIsOpenAnnotate, textAreaValue, setTextAreaValue, saveAnnotate, isNewAnnotate, deleteAnnotate }) {
-
+ 
   const [isDeleted, setIsDeleted] = useState(false);
 
   const closeAnnotate =() => {

@@ -1,11 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 
-const SelectComponent = ({
-  options,
-  onSelectChange,
-  defaultText = "Select an option",
-  className,
-}) => {
+function SelectComponent ({options,onSelectChange,defaultText = "Select an option",className,}) { 
+ 
   const [selectedValue, setSelectedValue] = useState(defaultText);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -76,4 +72,4 @@ const SelectComponent = ({
   );
 };
 
-export default SelectComponent;
+export default React.memo(SelectComponent);

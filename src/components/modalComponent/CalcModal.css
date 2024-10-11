@@ -43,3 +43,20 @@
 .calcModal .expendClose img, .dragTitle img {
   cursor: pointer;
 }
+.more-vertical {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 25px;
+  flex-wrap: wrap;
+}
+.dot {
+  width: 4px;
+  height: 4px;
+  background-color: #fff;
+  border-radius: 48%;
+  margin: 2px;
+}
+.hand{
+  cursor: pointer;
+}

@@ -1,7 +1,9 @@
 import React from 'react';
 import { Button } from './Button';
 
-export const Footer = ({ onSubmit, onPrevious, onNext, onClickAnalysis, currentQuestionIndex, totalQuestions }) => {
+function Footer ({ onSubmit, onPrevious, onNext, onClickAnalysis, currentQuestionIndex, totalQuestions }){
+ 
+  
   return (
     <footer className="footer">
       <div className="nxtPrevBtn">
@@ -15,7 +17,7 @@ export const Footer = ({ onSubmit, onPrevious, onNext, onClickAnalysis, currentQ
         </Button>
         <Button
           type="button"
-          title="Submit"
+          title="Analysis"
           className="commonBtn next-Btn"
           onClick={onClickAnalysis}
         >
@@ -30,8 +32,11 @@ export const Footer = ({ onSubmit, onPrevious, onNext, onClickAnalysis, currentQ
             className="commonBtn prev-Btn"
             onClick={onPrevious}
           >
-            <img src={`${process.env.PUBLIC_URL}/img/backIcon.svg`}
-              style={{ height: "12px" }} /> Prev Ques.
+            <img 
+              src={`${process.env.PUBLIC_URL}/img/backIcon.svg`} 
+              style={{ height: "12px" }} 
+              alt="Back Icon"
+            /> Prev Ques.
           </Button>
         )}
         {currentQuestionIndex.current < totalQuestions - 1 && (
@@ -42,12 +47,18 @@ export const Footer = ({ onSubmit, onPrevious, onNext, onClickAnalysis, currentQ
             onClick={onNext}
             disabled={currentQuestionIndex.current === totalQuestions - 1} // Disable if at last question
           >
-            Next Ques.<img src={`${process.env.PUBLIC_URL}/img/nextIcon.svg`}
-              style={{ height: "12px", marginLeft: "5px" }} />
+            Next Ques.
+            <img 
+              src={`${process.env.PUBLIC_URL}/img/nextIcon.svg`} 
+              style={{ height: "12px", marginLeft: "5px" }} 
+              alt="Next Icon"
+            />
           </Button>
         )}
       </div>
     </footer>
   );
 };
+ 
+export default React.memo(Footer);
 

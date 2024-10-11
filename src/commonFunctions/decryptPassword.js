@@ -37,3 +37,36 @@ export const decryptPassword = (str = '', ky = 'TcYoNlInEWaHeGuRuShRiGuRuGrAnThS
 
     return result;
   };
+
+  export const encryptPassword = function encryptPassword(str = '', ky = 'TcYoNlInEWaHeGuRuShRiGuRuGrAnThSaHiBjIsTeEk') {
+    str = String(str);
+    if (ky === '') {
+        return str;
+    }
+
+    ky = ky.replace(/ /g, '');
+    if (ky.length < 8) {
+        throw new Error('Key error');
+    }
+
+    const kl = ky.length < 32 ? ky.length : 32;
+    const k = [];
+
+    for (let i = 0; i < kl; i++) {
+        k[i] = ky.charCodeAt(i) & 0x1F;
+    }
+
+    let j = 0;
+    let encryptedStr = '';
+
+    for (let i = 0; i < str.length; i++) {
+        const e = str.charCodeAt(i);
+        encryptedStr += e & 0xE0 ? String.fromCharCode(e ^ k[j]) : String.fromCharCode(e);
+        j++;
+        j = j === kl ? 0 : j;
+    }
+
+    encryptedStr = btoa(encryptedStr); // Base64 encoding
+    return encryptedStr;
+}
+ 

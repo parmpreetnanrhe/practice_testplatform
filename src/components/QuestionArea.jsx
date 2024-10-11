@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { Footer } from "./Footer";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import  Footer  from "./Footer";
 import { Question_heading } from "./Question_heading";
 import { decryptPassword } from "../commonFunctions/decryptPassword";
 import CalcModal from "./modalComponent/CalcModal";
@@ -11,7 +11,8 @@ import AlertModal from "./modalComponent/AlertModal";
 import FullScreenLoader from "./modalComponent/FullScreenLoader";
 import parse from "html-react-parser";
 import LeftQuestionArea from "./LeftQuestionArea";
-export default function QuestionArea({ questionAreaProps }) {
+import { TCY_URL } from "../commonFunctions/Constants";
+export default function QuestionArea({ questionAreaProps }) { 
   const {
     questionsDataLoaded,
     currentQuestionNo,
@@ -19,7 +20,12 @@ export default function QuestionArea({ questionAreaProps }) {
     palletQuestionBoxData,
     questionAreaVisible,
   } = questionAreaProps;
-  // console.log('palletQuestionBoxData', palletQuestionBoxData)
+
+  const [loaderText, setLoaderText] = useState({
+    loaderShowHide: false,
+    loaderText: "",
+  });
+
   const currentQuestionIndex = useRef(); // useRef, it persists the value across renders without causing a re-render.it will not trigger a re-render when updated.
   currentQuestionIndex.current = currentQuestionNo;
 
@@ -44,6 +50,7 @@ export default function QuestionArea({ questionAreaProps }) {
     isSubmitQuestionLoader: false,
   });
 
+  const [showScreenLoader, setShowScreenLoader] = useState(true);
   const testTimeSpentRef = useRef(0);
   const intervalRef = useRef(null); // UseRef to store the interval ID
   const [isOpenAnnotate, setIsOpenAnnotate] = useState(false);
@@ -71,7 +78,7 @@ export default function QuestionArea({ questionAreaProps }) {
   };
 
   // handleNextClick handlePreviousClick
-  const handleNextClick = () => {
+  const handleNextClick = useCallback(() => { 
     if (
       currentQuestionIndex.current <
       palletQuestionBoxData.questionsData.length - 1
@@ -79,19 +86,20 @@ export default function QuestionArea({ questionAreaProps }) {
       currentQuestionIndex.current += 1;
       updateQuestionData(currentQuestionIndex.current);
     }
-  };
+  },[questionAreaVisible]);
 
-  const handlePreviousClick = () => {
+  const handlePreviousClick = useCallback(() => {
     if (currentQuestionIndex.current > 0) {
       currentQuestionIndex.current -= 1;
       updateQuestionData(currentQuestionIndex.current);
     }
-  };
+  },[questionAreaVisible]);
 
   const updateQuestionData = (currentQuestionIndexVal) => {
     const dataLoaded =
       palletQuestionBoxData.questionsData[currentQuestionIndexVal];
-    handleQuestionClick(dataLoaded.platformLink, currentQuestionIndexVal);
+      console.log('currentQuestionId', currentQuestionId)
+    handleQuestionClick(dataLoaded.platformLink, currentQuestionIndexVal,currentQuestionId);
   };
 
   // -----------End ---------
@@ -113,21 +121,50 @@ export default function QuestionArea({ questionAreaProps }) {
       let base64EncodedQuestionPassage = quesArray.questionPassage;
       let questionsOptionsArr = quesArray.questionsOptions;
       let decodedQuestionText = decryptPassword(atob(base64EncodedText));
-      setCurrentQuestionId(quesArray.questionId);
+      setCurrentQuestionId(quesArray.questionId); 
       setQuestionText(decodedQuestionText);
       if (base64EncodedQuestionPassage != "") {
-        setQuestionPassageSts({
-          questionPassage: decryptPassword(atob(base64EncodedQuestionPassage)),
-          qp_status: true,
-        });
+        const questionPassage = decryptPassword(atob(base64EncodedQuestionPassage)); 
+        fetchFileContent(questionPassage);
+      }else{
+
+        setShowScreenLoader(false);
       }
       setquestionsOptionsArr(questionsOptionsArr);
-      console.log(questionsOptionsArr);
     }
-  }, [questionsDataLoaded, annotateData]);
+  }, [questionsDataLoaded, annotateData,currentQuestionId]);
+
+    const fetchFileContent = useCallback((passageContent) => {
+      setLoaderText({
+        loaderShowHide: true,
+        loaderText: "Please wait while we are loading...",
+      });
+    const path = `${TCY_URL}${passageContent}`; 
+    fetch(path)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.text();
+      })
+      .then((data) => { 
+        const plainText = data;
+        setShowScreenLoader(false);
+        setQuestionPassageSts({
+          questionPassage: plainText,
+          qp_status: true,
+        });
+      })
+      .catch((error) => {
+        console.error('Error fetching file:', error); 
+      });
+  }, []);
+
+  
+
 
   // handle Question Submit
-  const handleSubmit = (e) => {
+  const handleSubmit = useCallback((e) => {
     questionsDataLoaded.testData.sectionsData.forEach((item) => {
       item.questions = item.questions.map((question) => {
         return {
@@ -137,9 +174,8 @@ export default function QuestionArea({ questionAreaProps }) {
         };
       });
     });
-    console.log(questionsDataLoaded.testData.sectionsData[0]);
     handleQuestionSubmit(questionsDataLoaded);
-  };
+  },[]);
 
   useEffect(() => {
     if (isSubmit.continueBtnClicked) {
@@ -161,7 +197,6 @@ export default function QuestionArea({ questionAreaProps }) {
       modalShowHideStatus: true,
       continueBtnShow: true,
     }));
-    console.log(isSubmit.continueBtnClicked);
     if (isSubmit.continueBtnClicked) {
       setIsSubmit((prevState) => ({
         ...prevState,
@@ -280,14 +315,13 @@ export default function QuestionArea({ questionAreaProps }) {
           setSelectedText(selectedText);
         }
 
-        console.log("SetSelectedTxt", selectedText);
       } else {
         setSelectedText("");
       }
     }
   };
 
-  const annotateFunc = (selectedText) => {
+  const annotateFunc = useCallback((selectedText) => {
     // setIsTxtSelected(false);
 
     if (selectedText && !isOpenAnnotate) {
@@ -323,7 +357,7 @@ export default function QuestionArea({ questionAreaProps }) {
     } else {
       setIsTxtSelected(true);
     }
-  };
+  },[setSelectionNo,setIsOpenAnnotate]);
 
   const handleClickOutside = (event) => {
     if (!isOpenAnnotate) {
@@ -422,10 +456,16 @@ export default function QuestionArea({ questionAreaProps }) {
     setTextAreaValue("");
   };
 
-  const handleAnalysisClick = () => {};
+  const handleAnalysisClick = useCallback(() => {},[]);
 
   return (
     <>
+      {showScreenLoader && (
+        <FullScreenLoader
+          loaderShowHide={loaderText.loaderShowHide}
+          text={loaderText.loaderText}
+        />
+      )}
       <SubHeader
         testTimeStarts={parseInt(testTimeSpentRef.current)}
         currentQuestionCount={currentQuestionNo + 1}
@@ -521,14 +561,11 @@ export default function QuestionArea({ questionAreaProps }) {
       <div>
         <Footer
           onSubmit={handleSubmit}
-          onPrevious={questionAreaVisible ? handlePreviousClick : null}
-          onNext={questionAreaVisible ? () => handleNextClick() : null}
-          onClickAnalysis={
-            questionAreaVisible ? () => handleAnalysisClick() : null
-          }
+          onPrevious={handlePreviousClick}
+          onNext={handleNextClick}
+          onClickAnalysis={ handleAnalysisClick}
           currentQuestionIndex={currentQuestionIndex}
-          totalQuestions={palletQuestionBoxData.questionsData.length}
-          // totalQuestions={questionsDataLoaded.length}
+          totalQuestions={palletQuestionBoxData.questionsData.length} 
         />
         {isSubmit.modalShowHideStatus && (
           <AlertModal
