@@ -13,7 +13,8 @@ const Analysis = ({
   questionsOptionsArr,
   quesRightAns,
   selectedAnswers,
-  questionSolution
+  questionSolution,
+  sectionName
 }) => {
   const currentQuestionCount = palletQuestionBoxData.questionNo; 
   let questionResult = 0; // unattempted
@@ -41,7 +42,7 @@ const Analysis = ({
       <div className="popup-main">
         <div className="popup">
           <div className="popup-header">
-            <h3>Verbal Ability | Question: {currentQuestionCount}</h3>
+            <h3>{sectionName} | Question: {currentQuestionCount}</h3>
             {/* <span className="close-btn" onClick={onClose}>
               &times;
             </span> */}

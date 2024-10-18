@@ -27,9 +27,9 @@ export default function QuestionArea({ questionAreaProps }) {
     showAnalysisOnly,
     setShowAnalysisOnly,
     setPalletQuestionCorrectIncorrect,
-    itemsRef
-  } = questionAreaProps;
-
+    itemsRef,
+    sectionName
+  } = questionAreaProps; 
   const [loaderText, setLoaderText] = useState({
     loaderShowHide: false,
     loaderText: "",
@@ -151,9 +151,9 @@ export default function QuestionArea({ questionAreaProps }) {
       let base64EncodedQuestionSolution= quesArray.solution;
       let questionsOptionsArr = quesArray.questionsOptions;
       let decodedQuestionText = base64EncodedText
-        ? decryptPassword(atob(base64EncodedText))
+        ? parse(decryptPassword(atob(base64EncodedText)))
         : "";
-        
+
       if (base64EncodedQuestionPassage) {
         const questionPassage = decryptPassword(
           atob(base64EncodedQuestionPassage)
@@ -167,7 +167,7 @@ export default function QuestionArea({ questionAreaProps }) {
       setQuestionSolution((base64EncodedQuestionSolution ? parse(decryptPassword(atob(base64EncodedQuestionSolution))) : "")) 
       setCurrentQuestionId(quesArray.questionId);
       setquestionsOptionsArr(questionsOptionsArr); 
-      setQuestionText(parse(decodedQuestionText));
+      setQuestionText(decodedQuestionText);
     }
   }, [questionsDataLoaded, annotateData, currentQuestionId]);
 
@@ -521,12 +521,13 @@ export default function QuestionArea({ questionAreaProps }) {
         <>
           <SubHeader
             testTimeStarts={parseInt(testTimeSpentRef.current)}
-            currentQuestionCount={currentQuestionNo + 1}
+            currentQuestionCount={palletQuestionBoxData?.questionsData[currentQuestionNo].questionNo}
             showCalc={showCalc}
             annotateFunc={annotateFunc}
             selectedText={selectedText}
             isTxtSelected={isTxtSelected}
             annotateRef={annotateRef}
+            sectionName={sectionName}
           />
           <div className="question-main-container">
             {questionPassageSts.qp_status && (
@@ -534,6 +535,7 @@ export default function QuestionArea({ questionAreaProps }) {
                 passageContent={questionPassageSts.questionPassage}
               />
             )}
+            
             {questionText && (
               <div
                 className={`question-container ${
@@ -663,6 +665,7 @@ export default function QuestionArea({ questionAreaProps }) {
           quesRightAns={decryptPassword(atob(quesRightAns))}
           selectedAnswers={itemsRef?.current[currentQuestionNo]?.[0]?.answerGiven}
           questionSolution={questionSolution}
+          sectionName={sectionName}
         />
       }
     </>

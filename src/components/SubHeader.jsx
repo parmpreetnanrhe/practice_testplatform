@@ -3,7 +3,7 @@ import { Button } from './Button';
 import { Headings } from './Headings';
 import { TestInfoContext } from '../contexts/TestInfoContext';
 
-export default function SubHeader({ testTimeStarts, currentQuestionCount, showCalc, annotateFunc, selectedText, isTxtSelected, annotateRef }) {
+export default function SubHeader({ testTimeStarts, currentQuestionCount, showCalc, annotateFunc, selectedText, isTxtSelected, annotateRef ,sectionName }) {
 const TestInfoData = useContext(TestInfoContext);  
 
 
@@ -35,7 +35,7 @@ const formatTime = (seconds) => {
           type={1}
           title="Main Title"
           className="main-title"
-          text={`Verbal Ability | Question: ${currentQuestionCount }`}
+          text={`${sectionName} | Question: ${currentQuestionCount }`}
         />
       </div>
       <div>

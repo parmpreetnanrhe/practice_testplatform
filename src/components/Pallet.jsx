@@ -14,6 +14,7 @@ export default function Pallet() {
   };
   const [questionsDataLoaded, setQuestionsDataLoaded] = useState([]);
   const [currentQuestionNo, setCurrentQuestionNo] = useState(0);
+  const [sectionName,setSectionName] = useState("");
   const [categoryNamesArray, setCategoryNamesArray] = useState([]);
   const [questionAreaVisible, setQuestionAreaVisible] = useState(false);
   const [isPalletOpen, setIsPalletOpen] = useState(true);
@@ -31,9 +32,7 @@ export default function Pallet() {
   const [filterArray, setFilterArray] = useState({});
   const [selectedCategory, setSelectedCategory] = useState("Words in Context");
   const [selectedCategory2, setSelectedCategory2] = useState("All");
-  const [palletQuestionCorrectIncorrect,setPalletQuestionCorrectIncorrect] = useState([]); 
-
-  const optionsArray = ["All", "Correct", "Incorrect", "Un-attempted", "Flagged"];
+  const [palletQuestionCorrectIncorrect,setPalletQuestionCorrectIncorrect] = useState([]);  
 
   const options2 = Object.keys(filterArray).map((key) => ({
     link: filterArray[key].asc,
@@ -115,14 +114,14 @@ export default function Pallet() {
               value: category.cateId,
               label: category.name,
               subCatArr: category.subCats,
-            }));
-
-          setCategoryNamesArray(categories);
-          setFilterArray(
-            data.categoryNamesArray
-              .filter((category) => category.cateId === selectedCateId)[0]
-              ?.subCats.filter((subCat) => subCatId === subCat.cateId)[0]?.filterLinks
-          );
+            })); 
+            setSectionName(data.categoryNamesArray[0].name);
+            setCategoryNamesArray(categories);
+            setFilterArray(
+              data.categoryNamesArray
+                .filter((category) => category.cateId === selectedCateId)[0]
+                ?.subCats.filter((subCat) => subCatId === subCat.cateId)[0]?.filterLinks
+            );
         }
       } else {
         alert("No record Found!");
@@ -155,6 +154,7 @@ export default function Pallet() {
             setShowAnalysisOnly,
             setPalletQuestionCorrectIncorrect,
             itemsRef,
+            sectionName
           }}
         />
       )}
