@@ -3,6 +3,7 @@ import axios from 'axios';
 export const SubmitApi = async (questionsDataLoadedArr) => {
   const jsonString = JSON.stringify(questionsDataLoadedArr);
   const payLoads = btoa(jsonString);
+  const BASE_API_URL = process.env.REACT_APP_API_URL
   const payload = {
     dev: 10,
     platform: "android",
@@ -26,13 +27,11 @@ export const SubmitApi = async (questionsDataLoadedArr) => {
  
   try {
     const response = await axios.post(
-      '/app/api/practiceQueSubmitApiGeneric.php',
+      `${BASE_API_URL}/app/api/practiceQueSubmitApiGeneric.php`,
       queryString, 
-      {
-        method: 'POST',
+      { 
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded", // or 'application/json' if the server expects JSON
-          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/x-www-form-urlencoded", // or 'application/json' if the server expects JSON 
         }, 
       }
     );

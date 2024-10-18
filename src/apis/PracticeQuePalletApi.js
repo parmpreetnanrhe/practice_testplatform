@@ -1,13 +1,14 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import { decryptPassword, encryptPassword } from '../commonFunctions/decryptPassword';
+import React, { useEffect, useState } from 'react';
+import { decryptPassword, encryptPassword } from '../config/commonFunctions/decryptPassword';
 
 export const PracticeQuePalletApi = async (payLoads) => { 
-
-  console.log('first1', payLoads)
+  
+  const BASE_API_URL = process.env.REACT_APP_API_URL;
   const encryString = decryptPassword(payLoads);
   const updatedQueryString = encryString.replace("sortingType=descending", "sortingType=ascending");   
   const payLoadsNew = encryptPassword(updatedQueryString); 
+
   const payload = {
     payLoads: payLoadsNew,
     dev: 10,
@@ -24,28 +25,21 @@ export const PracticeQuePalletApi = async (payLoads) => {
     beta_idd: 496956,
     beta_id: 496956,
     cms_id: 496956,
-    sortingType:"ascending"
+    sortingType: "ascending"
   };
-  const queryString = Object.keys(payload)
-    .map(key => `${key}=${payload[key]}`)
-    .join('&');
+
+  const queryString = new URLSearchParams(payload).toString();
 
   try {
-    const response = await axios.post(
-      'app/api/practiceQuePalletApiGeneric.php',
-      queryString,
-      {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "Access-Control-Allow-Origin": "*",
-        }, 
-      }
-    );
+    const response = await axios.post(`${BASE_API_URL}/app/api/practiceQuePalletApiGeneric.php`, queryString, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+
     return response.data;
   } catch (err) {
     console.error('Error fetching data:', err);
     throw err; // Re-throw the error so it can be handled elsewhere
   }
-
 }

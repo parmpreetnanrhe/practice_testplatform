@@ -1,165 +1,140 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { Button } from "./Button";
 import SelectComponent from "./SelectComponent";
-import { PracticeQuesPallet } from "../contexts/PracticeQuesPalletContext";
 import QuestionArea from "./QuestionArea";
 import { FetchQuestionDataApi } from "../apis/FetchQuestionDataApi";
 import FullScreenLoader from "./modalComponent/FullScreenLoader";
 import { PracticeQuePalletApi } from "../apis/PracticeQuePalletApi";
 
-export default function Pallet() { 
+export default function Pallet() {
   const [questionsDataLoaded, setQuestionsDataLoaded] = useState([]);
   const [currentQuestionNo, setCurrentQuestionNo] = useState(0);
   const [categoryNamesArray, setCategoryNamesArray] = useState([]);
   const [questionAreaVisible, setQuestionAreaVisible] = useState(false);
-  const [isPalletOpen, setIsPalletOpen] = useState(true); 
+  const [isPalletOpen, setIsPalletOpen] = useState(true);
   const [showScreenLoader, setShowScreenLoader] = useState(true);
   const [disabled, setDisabled] = useState(true);
-
-  const [palletCachedData, setPalletCachedData] = useState({}); 
-  const [questionCachedData, setQuestionCachedData] = useState({});
+  const [selectedCateObj, setSelectedCateObj] = useState({});
   const [currentQuestionId, setCurrentQuestionId] = useState(0);
-  console.log('questionCachedData', questionCachedData)
   const [loaderText, setLoaderText] = useState({
     loaderShowHide: false,
     loaderText: "",
   });
-  // pallet data coming from context
+  const [showAnalysisOnly, setShowAnalysisOnly] = useState(false);
   const [palletQuestionBoxData, setPalletQuestionBoxData] = useState([]);
-  const [palletLoading,setPalletLoading] = useState(true);
-  // const handlePalletQuestionsLoad = palletData.handlePalletLoadApi; 
-  const optionsArray = [
-    "All",
-    "Correct",
-    "Incorrect",
-    "Un-attempted",
-    "Flagged",
-  ];
-  const options2 = optionsArray.map((option, index) => ({
-    value: index,
-    label: option,
+  const [palletLoading, setPalletLoading] = useState(true);
+  const [filterArray, setFilterArray] = useState({});
+  const [selectedCategory, setSelectedCategory] = useState("Words in Context");
+  const [selectedCategory2, setSelectedCategory2] = useState("All");
+  const [palletQuestionCorrectIncorrect,setPalletQuestionCorrectIncorrect] = useState([]); 
+
+  const optionsArray = ["All", "Correct", "Incorrect", "Un-attempted", "Flagged"];
+
+  const options2 = Object.keys(filterArray).map((key) => ({
+    link: filterArray[key].asc,
+    name: key,
   }));
 
-  const togglePanel = () => { 
+  const togglePanel = () => {
     if (!disabled) {
-      setIsPalletOpen(!isPalletOpen);
-      setShowScreenLoader(true); 
-      setLoaderText({
-        loaderShowHide: false,
-        loaderText: "",
-      }); 
-      if(showScreenLoader){
-        setShowScreenLoader(false); 
-      }
+      setIsPalletOpen((prev) => !prev);
+      setShowScreenLoader((prev) => !prev);
+      setLoaderText({ loaderShowHide: false, loaderText: "" });
     }
   };
 
-  // Fetch question data when a question-box is clicked
-  const handleQuestionClick = useCallback(async (platformLink,questionNo,question_Id) => { 
-    setIsPalletOpen(false);
-    setQuestionAreaVisible(false);
-    setShowScreenLoader(true); 
-    setLoaderText({  
-      loaderShowHide: true,
-      loaderText: "Please wait while we are loading...",
-    });
-     
+  const handleQuestionClick = useCallback(
+    async (platformLink, questionNo, questionId) => {
+      setIsPalletOpen(false);
+      setQuestionAreaVisible(false);
+      setShowScreenLoader(true);
+      setLoaderText({ loaderShowHide: true, loaderText: "Please wait while we are loading..." });
+      setDisabled(true);
 
-    if (question_Id > 0 && questionCachedData[question_Id]) {   
-      const data = questionCachedData[question_Id];
-        setQuestionsDataLoaded(data);
-        setCurrentQuestionNo(questionNo);
-        setQuestionAreaVisible(true); 
-        setShowScreenLoader(false); 
-        setDisabled(false); 
-    }else{ 
-    await FetchQuestionDataApi(platformLink, questionNo)
-      .then((data) => {
-        if (data.success == 0) {
-          alert("Something went wrong Pallet API!"); 
+      try {
+        const data = await FetchQuestionDataApi(platformLink, questionNo);
+
+        if (data.success) {
+          const analysisAvailable = data?.testData[0]?.sectionsData[0]?.questions[0].attemptsData?.analysisData; 
+          setShowAnalysisOnly(!!analysisAvailable);
+          setCurrentQuestionId(questionId);
+          setQuestionsDataLoaded(data);
+          setCurrentQuestionNo(questionNo);
+          setQuestionAreaVisible(true);
+        } else {
+          alert("No Record Found!");
         }
-        setQuestionCachedData(prevCache => ({
-          ...prevCache,
-        [question_Id]: data
-        })); 
-        setCurrentQuestionId(question_Id);
-        setQuestionsDataLoaded(data);
-        setCurrentQuestionNo(questionNo);
-        setQuestionAreaVisible(true); 
+      } catch (error) {
+        console.error("Error fetching question data:", error);
+      } finally {
         setShowScreenLoader(false);
         setDisabled(false);
-      })
-      .catch((error) => console.error("Error fetching question data:", error));
-    }
-  },[questionCachedData]);
+      }
+    },
+    []
+  );
 
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const handlePalletDataLoad = async (selectedValue) => {
+  const handlePalletDataLoad = async (selectedCategoriesObj) => {
     setQuestionAreaVisible(false);
     setShowScreenLoader(true);
     setPalletLoading(true);
-    setLoaderText((prev)=>({ 
-      ...prev,
-      loaderShowHide: false,
-      loaderText: "",
-    }));
+    setLoaderText({ loaderShowHide: false, loaderText: "" });
     setPalletQuestionBoxData([]);
-    const payLoads = selectedValue;
-    handlePalletLoadApi(payLoads);
-    setSelectedCategory(selectedValue); 
+
+    if (selectedCategoriesObj.selectCategory === "filter") {
+      setSelectedCategory2(selectedCategoriesObj.subCatName);
+    } else {
+      setSelectedCategory(selectedCategoriesObj.subCatName);
+    }
+
+    handlePalletLoadApi(
+      selectedCategoriesObj.payLoadLink,
+      selectedCategoriesObj.cateId,
+      selectedCategoriesObj.subCatId
+    );
   };
 
-  const handlePalletLoadApi = useCallback(async (payLoads) => { 
+  const handlePalletLoadApi = useCallback(async (payLoads, selectedCateId, subCatId) => {
     setDisabled(true);
-    if (palletCachedData[payLoads]) { 
-      const data = palletCachedData[payLoads];
-      setPalletQuestionBoxData(data);
-      if (data && data.categoryNamesArray) {
-        const categoriesWithSubCats = data.categoryNamesArray.filter(
-          (category) => category.subCats && category.subCats.length > 0
-        );
-        const categories = categoriesWithSubCats.map((data) => ({
-          value: data.cateId,
-          label: data.name,
-          subCatArr: data.subCats,
-        }));
-        setCategoryNamesArray(categories);
-        setPalletLoading(false);
-      }
-      return;
-    }
-    await PracticeQuePalletApi(payLoads)
-      .then((data) => {
-        if (data.success == 0) {
-          alert("Something went wrong in pallet API!");
-        } else {
-          setPalletCachedData(prevCache => ({
-            ...prevCache,
-            [payLoads]: data
-          }));
-          setPalletQuestionBoxData(data);
-          if (data && data.categoryNamesArray) {
-            const categoriesWithSubCats = data.categoryNamesArray.filter(
-              (category) => category.subCats && category.subCats.length > 0
-            );
-            const categories = categoriesWithSubCats.map((data) => ({
-              value: data.cateId,
-              label: data.name,
-              subCatArr: data.subCats,
-            }));
-            setCategoryNamesArray(categories);
-            setPalletLoading(false);
-          }
-        }
-      })
-      .catch((error) => console.error("Error fetching question data:", error));
-  },[palletCachedData]);
 
-  useEffect(() => {
-    const payLoads =
-      "Y2twbGZPaHpgcG56fDokIiUjOCEvZHRmcE52PD8kOCMkMD98em17ekl+bGFxOiU0ZGZtYX1uenxmRXdtYXpvR3s+an9rbWJna3Ane2p1YXt7dFxreWIoc2Zkd29qfWZ0MmVwY3ppe1p8Z2Q1ZGt5NHR5aWpbYmRncHRmPD8=";
-    handlePalletLoadApi(payLoads);
+    try {
+      const data = await PracticeQuePalletApi(payLoads);
+
+      if (data.success) {
+        setPalletQuestionBoxData(data);
+
+        if (data.categoryNamesArray) {
+          const categories = data.categoryNamesArray
+            .filter((category) => category.subCats && category.subCats.length > 0)
+            .map((category) => ({
+              value: category.cateId,
+              label: category.name,
+              subCatArr: category.subCats,
+            }));
+
+          setCategoryNamesArray(categories);
+          setFilterArray(
+            data.categoryNamesArray
+              .filter((category) => category.cateId === selectedCateId)[0]
+              ?.subCats.filter((subCat) => subCatId === subCat.cateId)[0]?.filterLinks
+          );
+        }
+      } else {
+        alert("No record Found!");
+      }
+    } catch (error) {
+      console.error("Error fetching question data:", error);
+    } finally {
+      setPalletLoading(false);
+      setDisabled(false);
+    }
   }, []); 
+  useEffect(() => {
+    const payLoads = "Y2twbGZPaHpgcG56fDokIiUjOCEvZHRmcE52PDckMSMlNz9uZG1xXGBmdG12cygiM2B8c3tzWXt4bmY8PjJ7fGZ3cGFpWHB+YCpge2Zie3Z8fW80b255ZnB1Rnh+cTVyeG8/fntpenpseG97R2J5fXt0XH00PiUrJTYiJ31xa2d9bHdbd3xsMzU=";
+    setSelectedCateObj({ cateId: "909010", subCatId: "909014" });
+    handlePalletLoadApi(payLoads, "909010", "909014");
+  }, [handlePalletLoadApi]);
+
   return (
     <>
       {questionAreaVisible && (
@@ -171,21 +146,19 @@ export default function Pallet() {
             handleQuestionClick,
             palletQuestionBoxData,
             questionAreaVisible,
+            showAnalysisOnly,
+            setShowAnalysisOnly,
+            setPalletQuestionCorrectIncorrect
           }}
         />
       )}
 
       {showScreenLoader && (
-        <FullScreenLoader
-          loaderShowHide={loaderText.loaderShowHide}
-          text={loaderText.loaderText}
-        />
+        <FullScreenLoader loaderShowHide={loaderText.loaderShowHide} text={loaderText.loaderText} />
       )}
 
       <div
-        className={`pallet-button ${isPalletOpen ? "pallet-button-move" : ""} ${
-          disabled ? "disabledEvents" : ""
-        }`}
+        className={`pallet-button ${isPalletOpen ? "pallet-button-move" : ""} ${disabled ? "disabledEvents" : ""}`}
       >
         <Button
           type="button"
@@ -201,56 +174,78 @@ export default function Pallet() {
           />
         </Button>
       </div>
-      <div className={`side-panel ${isPalletOpen ? "open" : ""} `}>
-        <div className={`select-pallet-tag `}>
-          <SelectComponent
-            options={categoryNamesArray}
-            onSelectChange={handlePalletDataLoad}
-            defaultText="Please select a value"
-            className={`${palletLoading ? "loading" : ""}`}
-          />
-          <SelectComponent
-            options={options2}
-            onSelectChange=""
-            defaultText="Please select a value"
-            className={`${palletLoading ? "loading" : ""}`}
-          />
+
+      <div className={`side-panel ${isPalletOpen ? "open" : ""}`}>
+        <div className="select-pallet-tag">
+          {palletLoading ? (
+            <>
+              <div className="filterDropdown loading">
+                <div className="selectedVal">Please select a value</div>
+              </div>
+              <div className="filterDropdown loading">
+                <div className="selectedVal">Please select a value</div>
+              </div>
+            </>
+          ) : (
+            <>
+              <SelectComponent
+                options={categoryNamesArray}
+                onSelectChange={handlePalletDataLoad}
+                defaultText={selectedCategory}
+                className={palletLoading ? "loading" : ""}
+                selectedCateObj={selectedCateObj}
+                setSelectedCateObj={setSelectedCateObj}
+              />
+              <SelectComponent
+                options={options2}
+                onSelectChange={handlePalletDataLoad}
+                defaultText={selectedCategory2}
+                className={palletLoading ? "loading" : ""}
+                selectedCateObj={selectedCateObj}
+                setSelectedCateObj={setSelectedCateObj}
+              />
+            </>
+          )}
         </div>
-        <div className={`question-box-container`}>
-          {palletQuestionBoxData.questionsData &&
-          palletQuestionBoxData.questionsData.length > 0
-            ? palletQuestionBoxData.questionsData.map((queData, index) => (
-                <div
-                  key={queData.questionId}
-                  className={`ques-box ${
-                    queData.questionNo - 1 === currentQuestionNo &&
-                    questionAreaVisible
-                      ? "disabledEvents"
-                      : ""
-                  }`}
-                  onClick={() => {
-                    if (
-                      !questionAreaVisible ||
-                      queData.questionNo - 1 !== currentQuestionNo
-                    ) {
-                      handleQuestionClick(
-                        queData.platformLink,
-                        queData.questionNo - 1,
-                        queData.questionId
-                      );
-                    }
-                  }}
-                >
-                  <span>{queData.questionNo}</span>
-                </div>
-              ))
-            : Array(55)
-                .fill()
-                .map((_, i) => (
-                  <div key={i} className="ques-box loading">
-                    <span>{i + 1}</span> {/* Displaying 1 to 56 */}
+
+        <div className="question-box-container">
+          {palletQuestionBoxData.questionsData?.length > 0
+            ? palletQuestionBoxData.questionsData.map((queData, index) => { 
+
+                let questionResult = queData.attemptsData?.[0]?.analysisData?.result || 0; 
+                
+                const submitUpdateResult = palletQuestionCorrectIncorrect?.filter((data) => data.currentQuestionNo === index);  
+                if (submitUpdateResult.length > 0) { 
+                  if(submitUpdateResult[0].quesRightAns == submitUpdateResult[0].selectedAnswers){
+                    questionResult = 1;
+                  }else{
+                    questionResult = 2;
+                  }  
+                }
+                
+                const resultClass = questionResult === 1 ? "correct-Ques" : questionResult === 2 ? "incorrect-Ques" : "";
+
+                const quesPayloadLink = questionResult > 0 ? queData.analysisLink : queData.platformLink;  
+
+                return (
+                  <div
+                    key={queData.questionId}
+                    className={`ques-box ${index === currentQuestionNo && questionAreaVisible ? "disabledEvents" : ""} ${resultClass}`}
+                    onClick={() => {
+                      if (!questionAreaVisible || queData.index !== currentQuestionNo) {
+                        handleQuestionClick(quesPayloadLink, index, queData.questionId);
+                      }
+                    }}
+                  >
+                    <span>{queData.questionNo}</span>
                   </div>
-                ))}
+                );
+              })
+            : Array.from({ length: 55 }, (_, i) => (
+                <div key={i} className="ques-box loading">
+                  <span>{i + 1}</span>
+                </div>
+              ))}
         </div>
       </div>
     </>

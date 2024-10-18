@@ -36,7 +36,7 @@
     align-items: center;
     padding: 15px 0px;
     cursor: text;
-    flex-wrap: wrap;
+    flex-wrap: wrap; 
 }
 
 .modalContent .modalFooter, .modalBoxTestPlatformContent .modalFooterTestPlatform {

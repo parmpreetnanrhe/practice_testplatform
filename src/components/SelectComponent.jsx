@@ -1,17 +1,23 @@
 import React, { useState, useEffect, useRef } from "react";
 
-function SelectComponent ({options,onSelectChange,defaultText = "Select an option",className,}) { 
- 
+function SelectComponent({
+  options,
+  onSelectChange,
+  defaultText = "Please select a value",
+  className,
+  selectedCateObj,
+  setSelectedCateObj
+}) {
   const [selectedValue, setSelectedValue] = useState(defaultText);
+
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-
-  // Handle click on option item
-  const handleOptionClick = (data) => {
-    setSelectedValue(data.name); // Update displayed value (label)
+  const handleOptionClick = (selectedObj) => {
+    setSelectedValue(selectedObj.catName); // Update displayed value (label)
     setIsOpen(false); // Close the dropdown
-    if (onSelectChange) {
-      onSelectChange(data.link); // Pass the selected value to parent or other logic
+    setSelectedCateObj(selectedObj);
+    if (onSelectChange) { 
+      onSelectChange(selectedObj)
     }
   };
 
@@ -23,8 +29,7 @@ function SelectComponent ({options,onSelectChange,defaultText = "Select an optio
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
       setIsOpen(false);
     }
-  };
-
+  }; 
   return (
     <>
       <div
@@ -38,28 +43,49 @@ function SelectComponent ({options,onSelectChange,defaultText = "Select an optio
             {options.map((option, index) => {
               // Check if the subCatArr exists and has items
               if (option.subCatArr && option.subCatArr.length > 0) {
+                const cateId = option.value;
                 return (
-                  <div className="selectOptions" key={option.cateId}>
+                  <div className="selectOptions" key={option.value}>
                     <h1>{option.label}</h1>
-                    {option.subCatArr.map((data, subIndex) => (
-                      <div
-                        onClick={() => handleOptionClick(data)}
-                        key={subIndex}
-                        className="optionItem"
-                        value={data.cateId}
-                        link={data.link}
-                      >
-                        {data.name}
-                      </div>
-                    ))}
+                    {option.subCatArr.map((data, subIndex) => {
+                      const selectedObj = {
+                        selectCategory: "selectedCategory",
+                        cateId: cateId,
+                        subCatName: data.name,
+                        payLoadLink:data.link,
+                        subCatId:data.cateId,
+                      };
+                      return (
+                        <div
+                          onClick={(e) => handleOptionClick(selectedObj)}
+                          key={subIndex}
+                          className="optionItem" 
+                        >
+                          {data.name}
+                        </div>
+                      );
+                    })}
                   </div>
                 );
               } else {
                 // Render this if subCatArr is empty or doesn't exist
+                const selectedObj = {
+                  selectCategory: "filter", 
+                  cateId: selectedCateObj.cateId,
+                  subCatName: option.name,
+                  payLoadLink:option.link, 
+                  subCatId:selectedCateObj.subCatId,
+                };
                 return (
-                  <div className="selectOptions" key={option.cateId}> 
-                    <div className="optionItem" key={index}>
-                      {option.label}
+                  <div className="selectOptions" key={index}>
+                    <div
+                      onClick={(e) => handleOptionClick(selectedObj)}
+                      className="optionItem"
+                      key={index}
+                      link={option.link}
+                      name="filter"
+                    >
+                      {option.name}
                     </div>
                   </div>
                 );
@@ -70,6 +96,6 @@ function SelectComponent ({options,onSelectChange,defaultText = "Select an optio
       </div>
     </>
   );
-};
+}
 
 export default React.memo(SelectComponent);

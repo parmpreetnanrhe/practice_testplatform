@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 export const FetchQuestionDataApi = async (payLoads) => {
+  const BASE_API_URL = process.env.REACT_APP_API_URL
   const payload = {
     dev: 10,
     platform: "android",
@@ -24,13 +25,11 @@ export const FetchQuestionDataApi = async (payLoads) => {
  
   try {
     const response = await axios.post(
-      '/app/api/practiceQueDataFetchApiGeneric.php',
+      `${BASE_API_URL}/app/api/practiceQueDataFetchApiGeneric.php`,
       queryString,
-      {
-        method: 'POST',
+      { 
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded", // or 'application/json' if the server expects JSON
-          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/x-www-form-urlencoded",
         }, 
       }
     );

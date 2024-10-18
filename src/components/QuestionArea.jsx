@@ -1,7 +1,7 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
-import  Footer  from "./Footer";
+import React, { useCallback, useEffect,useRef,useState } from "react";
+import Footer from "./Footer";
 import { Question_heading } from "./Question_heading";
-import { decryptPassword } from "../commonFunctions/decryptPassword";
+import { decryptPassword } from "../config/commonFunctions/decryptPassword";
 import CalcModal from "./modalComponent/CalcModal";
 import Annotate from "./modalComponent/Annotate";
 import Input from "./Input";
@@ -11,14 +11,22 @@ import AlertModal from "./modalComponent/AlertModal";
 import FullScreenLoader from "./modalComponent/FullScreenLoader";
 import parse from "html-react-parser";
 import LeftQuestionArea from "./LeftQuestionArea";
-import { TCY_URL } from "../commonFunctions/Constants";
-export default function QuestionArea({ questionAreaProps }) { 
+import { TCY_URL } from "../config/commonFunctions/Constants";
+import { updateImageSrcInString } from "../config/commonFunctions/common-functions";
+import Analysis from "./Analysis";
+
+export default function QuestionArea({ questionAreaProps }) {
+  const continueBtnMessage = parse(`Are you sure that you want to submit this question If you click{" "} <b>Continue,</b> you will not be able to return to this question later.`);
+  const answerGivenMessage = "To submit your answer, please ensure you have selected an option.";
   const {
     questionsDataLoaded,
     currentQuestionNo,
     handleQuestionClick,
     palletQuestionBoxData,
     questionAreaVisible,
+    showAnalysisOnly,
+    setShowAnalysisOnly,
+    setPalletQuestionCorrectIncorrect
   } = questionAreaProps;
 
   const [loaderText, setLoaderText] = useState({
@@ -28,16 +36,13 @@ export default function QuestionArea({ questionAreaProps }) {
 
   const currentQuestionIndex = useRef(); // useRef, it persists the value across renders without causing a re-render.it will not trigger a re-render when updated.
   currentQuestionIndex.current = currentQuestionNo;
-
+  const [quesRightAns, setQuesRightAns] = useState("");
   const [selectedAnswers, setSelectedAnswers] = useState(""); // Store user Answer Selection
   const [questionPassageSts, setQuestionPassageSts] = useState({
     questionPassage: "",
     qp_status: false,
   });
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [loadQuestionSts, setLadQuestionSts] = useState(false);
   const [questionText, setQuestionText] = useState();
-  const [currentQuesData, setCurrentQuesData] = useState();
   const [questionsOptionsArr, setquestionsOptionsArr] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
   const [isStrikeItems, setIsStrike] = useState({});
@@ -48,7 +53,10 @@ export default function QuestionArea({ questionAreaProps }) {
     continueBtnClicked: false,
     modalShowHideStatus: false,
     isSubmitQuestionLoader: false,
+    message: continueBtnMessage,
   });
+
+  const [submitNotAllowed, setSubmitNotAllowed] = useState(true);
 
   const [showScreenLoader, setShowScreenLoader] = useState(true);
   const testTimeSpentRef = useRef(0);
@@ -60,7 +68,9 @@ export default function QuestionArea({ questionAreaProps }) {
   const [selectionNo, setSelectionNo] = useState(0);
   const [annotateData, setAnnotateData] = useState([]);
   const [textAreaValue, setTextAreaValue] = useState("");
-  const [isNewAnnotate, setNewAnnotate] = useState(true);
+  const [isNewAnnotate, setNewAnnotate] = useState(true); 
+  const [questionAnalysis, setQuestionAnalysis] = useState([]);
+  const [questionSolution,setQuestionSolution] = useState("");
 
   // Toggle the visibility of SecondComponent
   const handleToggleVisibility = () => {
@@ -86,20 +96,49 @@ export default function QuestionArea({ questionAreaProps }) {
       currentQuestionIndex.current += 1;
       updateQuestionData(currentQuestionIndex.current);
     }
-  },[questionAreaVisible]);
+  }, [questionAreaVisible]);
 
   const handlePreviousClick = useCallback(() => {
     if (currentQuestionIndex.current > 0) {
       currentQuestionIndex.current -= 1;
       updateQuestionData(currentQuestionIndex.current);
     }
-  },[questionAreaVisible]);
+  }, [questionAreaVisible]);
 
   const updateQuestionData = (currentQuestionIndexVal) => {
+    testTimeSpentRef.current = 0;
     const dataLoaded =
-      palletQuestionBoxData.questionsData[currentQuestionIndexVal];
-      console.log('currentQuestionId', currentQuestionId)
-    handleQuestionClick(dataLoaded.platformLink, currentQuestionIndexVal,currentQuestionId);
+      palletQuestionBoxData?.questionsData[currentQuestionIndexVal];
+    let questionResult = 0; // unattempted
+    if (dataLoaded?.attemptsData?.length > 0) {
+      questionResult = dataLoaded?.attemptsData[0].analysisData.result;
+    }
+
+    questionsDataLoaded.testData[0]?.sectionsData.forEach((item) => {
+      item.questions.forEach((question) => { 
+        if(typeof question.answerGiven != "undefined"){
+          let answerGiven = atob(question.answerGiven); 
+          if(answerGiven == quesRightAns){
+            questionResult = 1;
+          }else{
+            questionResult = 2;
+          }
+        }  
+      });
+    });
+
+ 
+
+    let quesPayloadLink = dataLoaded?.platformLink;
+    if (questionResult > 0) {
+      quesPayloadLink = dataLoaded?.analysisLink;
+    }
+
+    handleQuestionClick(
+      quesPayloadLink,
+      currentQuestionIndexVal,
+      dataLoaded.questionId
+    );
   };
 
   // -----------End ---------
@@ -107,75 +146,95 @@ export default function QuestionArea({ questionAreaProps }) {
   useEffect(() => {
     if (
       questionsDataLoaded &&
-      questionsDataLoaded.testData &&
-      questionsDataLoaded.testData.sectionsData
+      questionsDataLoaded.testData[0] &&
+      questionsDataLoaded.testData[0].sectionsData
     ) {
-      let quesArray;
-      let encodedString = questionsDataLoaded.testData.sectionsData;
-      encodedString.map((item) => {
-        item.questions.map((questions) => {
+      let quesArray = {};
+      let encodedString = questionsDataLoaded.testData[0]?.sectionsData;
+      encodedString?.map((item) => {
+        item.questions?.map((questions) => {
           quesArray = questions;
         });
       });
       let base64EncodedText = quesArray.questionText;
       let base64EncodedQuestionPassage = quesArray.questionPassage;
+      let base64EncodedQuestionSolution= quesArray.solution;
       let questionsOptionsArr = quesArray.questionsOptions;
-      let decodedQuestionText = decryptPassword(atob(base64EncodedText));
-      setCurrentQuestionId(quesArray.questionId); 
-      setQuestionText(decodedQuestionText);
-      if (base64EncodedQuestionPassage != "") {
-        const questionPassage = decryptPassword(atob(base64EncodedQuestionPassage)); 
+      let decodedQuestionText = base64EncodedText
+        ? decryptPassword(atob(base64EncodedText))
+        : "";
+      if (base64EncodedQuestionPassage) {
+        const questionPassage = decryptPassword(
+          atob(base64EncodedQuestionPassage)
+        );
         fetchFileContent(questionPassage);
-      }else{
-
+      } else {
         setShowScreenLoader(false);
-      }
-      setquestionsOptionsArr(questionsOptionsArr);
-    }
-  }, [questionsDataLoaded, annotateData,currentQuestionId]);
+      }  
 
-    const fetchFileContent = useCallback((passageContent) => {
-      setLoaderText({
-        loaderShowHide: true,
-        loaderText: "Please wait while we are loading...",
-      });
-    const path = `${TCY_URL}${passageContent}`; 
+      setQuesRightAns(quesArray.rightAnswer);
+      setQuestionSolution((base64EncodedQuestionSolution ? parse(decryptPassword(atob(base64EncodedQuestionSolution))) : "")) 
+      setCurrentQuestionId(quesArray.questionId);
+      setquestionsOptionsArr(questionsOptionsArr); 
+      setQuestionText(parse(decodedQuestionText));
+    }
+  }, [questionsDataLoaded, annotateData, currentQuestionId]);
+
+  const fetchFileContent = useCallback((passageContent) => { 
+    setLoaderText({
+      loaderShowHide: true,
+      loaderText: "Please wait while we are loading...",
+    });
+    const path = `${TCY_URL}${passageContent}`;
     fetch(path)
       .then((response) => {
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error("Network response was not ok");
         }
         return response.text();
       })
-      .then((data) => { 
+      .then((data) => {
         const plainText = data;
         setShowScreenLoader(false);
         setQuestionPassageSts({
-          questionPassage: plainText,
+          questionPassage: parse(updateImageSrcInString(plainText)),
           qp_status: true,
         });
       })
       .catch((error) => {
-        console.error('Error fetching file:', error); 
+        console.error("Error fetching file:", error);
       });
   }, []);
 
-  
-
-
   // handle Question Submit
-  const handleSubmit = useCallback((e) => {
-    questionsDataLoaded.testData.sectionsData.forEach((item) => {
+  const handleSubmit = (e) => {
+    if (selectedAnswers == "") {
+      setIsSubmit((prevState) => ({
+        ...prevState,
+        modalShowHideStatus: true,
+        continueBtnShow: false,
+        continueBtnClicked: false,
+        message: answerGivenMessage,
+      }));
+    } else {
+      setIsSubmit((prevState) => ({
+        ...prevState,
+        modalShowHideStatus: true,
+        continueBtnShow: true,
+        message: continueBtnMessage,
+      }));
+    }
+    questionsDataLoaded.testData[0]?.sectionsData.forEach((item) => {
       item.questions = item.questions.map((question) => {
         return {
           ...question,
-          answerGiven: selectedAnswers,
+          answerGiven: btoa(selectedAnswers),
           testTimeSpent: testTimeSpentRef.current,
         };
       });
     });
     handleQuestionSubmit(questionsDataLoaded);
-  },[]);
+  };
 
   useEffect(() => {
     if (isSubmit.continueBtnClicked) {
@@ -192,11 +251,6 @@ export default function QuestionArea({ questionAreaProps }) {
   // ------------ End ---------
   // Fetch question data when a question-box is clicked
   const handleQuestionSubmit = async (questionsDataLoaded) => {
-    setIsSubmit((prevState) => ({
-      ...prevState,
-      modalShowHideStatus: true,
-      continueBtnShow: true,
-    }));
     if (isSubmit.continueBtnClicked) {
       setIsSubmit((prevState) => ({
         ...prevState,
@@ -211,10 +265,20 @@ export default function QuestionArea({ questionAreaProps }) {
               isSubmitQuestionLoader: false,
             }));
           } else if (data.success == 1) {
+
             setIsSubmit((prevState) => ({
               ...prevState,
               isSubmitQuestionLoader: false,
             }));
+            setSubmitNotAllowed(false); 
+            handleAnalysisClick(); 
+
+ 
+            setPalletQuestionCorrectIncorrect([{
+              currentQuestionNo:currentQuestionNo,
+              quesRightAns: decryptPassword(atob(quesRightAns)),
+              selectedAnswers: selectedAnswers,
+          }]);
           } else {
             console.log("Something went wrong!");
           }
@@ -258,15 +322,17 @@ export default function QuestionArea({ questionAreaProps }) {
   }, [annotateData]); // Dependency array, runs when dummyValue changes
 
   useEffect(() => {
-    // Start the timer
-    intervalRef.current = setInterval(() => {
-      testTimeSpentRef.current += 1;
-    }, 1000);
+    if (showAnalysisOnly) {
+      // Start the timer
+      intervalRef.current = setInterval(() => {
+        testTimeSpentRef.current += 1;
+      }, 1000);
 
-    // Clean up the interval on component unmount
-    return () => {
-      clearInterval(intervalRef.current);
-    };
+      // Clean up the interval on component unmount
+      return () => {
+        clearInterval(intervalRef.current);
+      };
+    }
   }, [testTimeSpentRef.current]);
 
   useEffect(() => {
@@ -314,50 +380,48 @@ export default function QuestionArea({ questionAreaProps }) {
         if (parentDiv) {
           setSelectedText(selectedText);
         }
-
       } else {
         setSelectedText("");
       }
     }
   };
 
-  const annotateFunc = useCallback((selectedText) => {
-    // setIsTxtSelected(false);
-
-    if (selectedText && !isOpenAnnotate) {
-      setSelectionNo(selectionNo + 1);
-      const selection = window.getSelection();
-      var range = selection.getRangeAt(0);
-      let startNode = range.startContainer;
-      let endNode = range.endContainer;
-      if (
-        range.startContainer.nodeType === Node.TEXT_NODE &&
-        range.endContainer.nodeType === Node.TEXT_NODE
-      ) {
-        try {
-          let contents = range.extractContents();
-          console.log(contents);
-          var newNode = document.createElement("mark");
-          const spanNode = document.createElement("span");
-          spanNode.classList.add("tooltip");
-          newNode.classList.add("markPopup");
-          newNode.classList.add("active");
-          newNode.setAttribute("id", "mark_" + selectionNo);
-          newNode.setAttribute("serialNo", selectionNo);
-          // range.surroundContents(newNode);
-          newNode.appendChild(contents);
-          newNode.appendChild(spanNode);
-          range.insertNode(newNode);
-          selection.removeAllRanges();
-          setIsOpenAnnotate(!isOpenAnnotate);
-        } catch (e) {
-          console.error("Error wrapping contents:", e);
+  const annotateFunc = useCallback(
+    (selectedText) => {
+      if (selectedText && !isOpenAnnotate) {
+        setSelectionNo(selectionNo + 1);
+        const selection = window.getSelection();
+        var range = selection.getRangeAt(0);
+        let startNode = range.startContainer;
+        let endNode = range.endContainer;
+        if (
+          range.startContainer.nodeType === Node.TEXT_NODE &&
+          range.endContainer.nodeType === Node.TEXT_NODE
+        ) {
+          try {
+            let contents = range.extractContents();
+            var newNode = document.createElement("mark");
+            const spanNode = document.createElement("span");
+            spanNode.classList.add("tooltip");
+            newNode.classList.add("markPopup");
+            newNode.classList.add("active");
+            newNode.setAttribute("id", "mark_" + selectionNo);
+            newNode.setAttribute("serialNo", selectionNo);
+            newNode.appendChild(contents);
+            newNode.appendChild(spanNode);
+            range.insertNode(newNode);
+            selection.removeAllRanges();
+            setIsOpenAnnotate(!isOpenAnnotate);
+          } catch (e) {
+            console.error("Error wrapping contents:", e);
+          }
         }
+      } else {
+        setIsTxtSelected(true);
       }
-    } else {
-      setIsTxtSelected(true);
-    }
-  },[setSelectionNo,setIsOpenAnnotate]);
+    },
+    [setSelectionNo, setIsOpenAnnotate]
+  );
 
   const handleClickOutside = (event) => {
     if (!isOpenAnnotate) {
@@ -375,40 +439,30 @@ export default function QuestionArea({ questionAreaProps }) {
       const toolTip = document.createElement("div");
       toolTip.className = "toolTip";
       toolTip.textContent = annotateData[serialNo];
-
-      // Append the tooltip to the document body
       document.body.appendChild(toolTip);
-
-      // Get the dimensions of the tooltip and the target element
       const tooltipRect = toolTip.getBoundingClientRect();
       const markElementRect = markElement.getBoundingClientRect();
-
       // Calculate the position to center the tooltip above the target element
       let left =
         markElementRect.left +
         markElementRect.width / 2 -
         tooltipRect.width / 2;
       let top = markElementRect.top - tooltipRect.height - 5; // 5px above the element
-
       // Adjust position if tooltip goes off the left side of the window
       if (left < 0) {
         left = 5; // 5px from the left
       }
-
       // Adjust position if tooltip goes off the right side of the window
       if (left + tooltipRect.width > window.innerWidth) {
         left = window.innerWidth - tooltipRect.width - 5; // 5px from the right
       }
-
       // Adjust position if tooltip goes off the top of the window
       if (top < 0) {
         top = markElementRect.bottom + 5; // Place tooltip below the element
       }
-
       // Set the position of the tooltip
       toolTip.style.left = `${left}px`;
       toolTip.style.top = `${top}px`;
-
       // Show the tooltip
       toolTip.style.display = "block";
     }
@@ -428,7 +482,6 @@ export default function QuestionArea({ questionAreaProps }) {
     const markElement = e.target;
     const serialNo = markElement.getAttribute("serialNo");
     markElement.classList.add("active");
-    console.log(annotateData[serialNo]);
     if (annotateData[serialNo]) {
       setTextAreaValue(annotateData[serialNo]);
     } else {
@@ -444,20 +497,27 @@ export default function QuestionArea({ questionAreaProps }) {
     if (mark) {
       // Get the parent element of the mark element
       const parent = mark.parentNode;
-
       // Move all children of the mark element to the parent
       while (mark.firstChild) {
         parent.insertBefore(mark.firstChild, mark);
       }
-
       // Remove the mark element itself
       parent.removeChild(mark);
     }
     setTextAreaValue("");
   };
 
-  const handleAnalysisClick = useCallback(() => {},[]);
-
+  const handleAnalysisClick = () => {  
+    if (!showAnalysisOnly) {
+      setShowAnalysisOnly(true);
+    }
+  };
+  useEffect(() => { 
+    if (showAnalysisOnly) {
+      handleAnalysisClick();
+      setSubmitNotAllowed(false);
+    } 
+  }, []);
   return (
     <>
       {showScreenLoader && (
@@ -466,117 +526,120 @@ export default function QuestionArea({ questionAreaProps }) {
           text={loaderText.loaderText}
         />
       )}
-      <SubHeader
-        testTimeStarts={parseInt(testTimeSpentRef.current)}
-        currentQuestionCount={currentQuestionNo + 1}
-        showCalc={showCalc}
-        annotateFunc={annotateFunc}
-        selectedText={selectedText}
-        isTxtSelected={isTxtSelected}
-        annotateRef={annotateRef}
-      />
-      <div className="question-main-container">
-        {questionPassageSts.qp_status && (
-          <LeftQuestionArea
-            passageContent={questionPassageSts.questionPassage}
+      {!showAnalysisOnly && (
+        <>
+          <SubHeader
+            testTimeStarts={parseInt(testTimeSpentRef.current)}
+            currentQuestionCount={currentQuestionNo + 1}
+            showCalc={showCalc}
+            annotateFunc={annotateFunc}
+            selectedText={selectedText}
+            isTxtSelected={isTxtSelected}
+            annotateRef={annotateRef}
           />
-        )}
-        {questionText && (
-          <div
-            className={`question-container ${
-              !questionAreaVisible ? "loading" : ""
-            } `}
-          >
-            <Question_heading
-              onClick={handleToggleVisibility}
-              currentQuestionCount={currentQuestionNo + 1}
-            />
+          <div className="question-main-container">
+            {questionPassageSts.qp_status && (
+              <LeftQuestionArea
+                passageContent={questionPassageSts.questionPassage}
+              />
+            )}
             {questionText && (
-              <div className="single-question">
-                <h3 onMouseUp={SetSelectedTxt} className="makeselection">
-                  {parse(questionText)}
-                </h3>
-                {questionsOptionsArr.length > 0 &&
-                  questionsOptionsArr.map((optionsArr, arrIndex) =>
-                    optionsArr.map((option, index) => (
-                      <div
-                        className={`quesOptions${
-                          isStrikeItems[index] ? " strikeCls" : ""
-                        }`}
-                        key={`${option}-${arrIndex}-${index}`} // Unique key combining option and indices
-                      >
-                        <label
-                          className={`quesOpt ${
-                            !questionAreaVisible ? "loading" : ""
-                          }`}
-                          htmlFor={`${index + 1}-${currentQuestionNo}`}
-                        >
-                          {isStrikeItems[index] && isVisible && (
-                            <div className="optStrike"></div>
-                          )}
-                          <div className="perseusInteractive">
-                            <Input
-                              type="radio"
-                              id={`${index + 1}-${currentQuestionNo}`}
-                              name={`${currentQuestionId}`}
-                              value={index + 1}
-                              disabled={isStrikeItems[index]}
-                              checked={
-                                selectedAnswers === index + 1 &&
-                                !isStrikeItems[index]
-                              }
-                              onChange={() => handleCheckboxChange(index + 1)}
-                            />
-                            <span className="iconWrapper">
-                              {convertToLetter(index + 1)}
-                            </span>
-                          </div>
-                          <span className="optionTxt">
-                            {parse(decryptPassword(atob(optionsArr[index])))}
-                          </span>
-                        </label>
-                        {isVisible && (
+              <div
+                className={`question-container ${
+                  !questionAreaVisible ? "loading" : ""
+                } `}
+              >
+                <Question_heading
+                  onClick={handleToggleVisibility}
+                  currentQuestionCount={palletQuestionBoxData?.questionsData[currentQuestionNo].questionNo}
+                />
+                {questionText && (
+                  <div className="single-question">
+                    <h3 onMouseUp={SetSelectedTxt} className="makeselection">
+                      {questionText}
+                    </h3>
+                    {questionsOptionsArr.length > 0 &&
+                      questionsOptionsArr?.map((optionsArr, arrIndex) =>
+                        optionsArr?.map((option, index) => (
                           <div
-                            className="optDisabled"
-                            onClick={() => setStrike(index)}
+                            className={`quesOptions${
+                              isStrikeItems[index] ? " strikeCls" : ""
+                            }`}
+                            key={`${option}-${arrIndex}-${index}`} // Unique key combining option and indices
                           >
-                            {isStrikeItems[index] ? (
-                              <span className="undoCls">Undo</span>
-                            ) : (
-                              <span className="iconWrapper strikeIcon">
-                                {convertToLetter(index + 1)}
+                            <label
+                              className={`quesOpt ${
+                                !questionAreaVisible ? "loading" : ""
+                              }`}
+                              htmlFor={`${index + 1}-${currentQuestionNo}`}
+                            >
+                              {isStrikeItems[index] && isVisible && (
+                                <div className="optStrike"></div>
+                              )}
+                              <div className="perseusInteractive">
+                                <Input
+                                  type="radio"
+                                  id={`${index + 1}-${currentQuestionNo}`}
+                                  name={`${currentQuestionId}`}
+                                  value={index + 1}
+                                  disabled={isStrikeItems[index]}
+                                  checked={
+                                    selectedAnswers === index + 1 &&
+                                    !isStrikeItems[index]
+                                  }
+                                  onChange={() =>
+                                    handleCheckboxChange(index + 1)
+                                  }
+                                />
+                                <span className="iconWrapper">
+                                  {convertToLetter(index + 1)}
+                                </span>
+                              </div>
+                              <span className="optionTxt">
+                                {parse(
+                                  decryptPassword(atob(optionsArr[index]))
+                                )}
                               </span>
+                            </label>
+                            {isVisible && (
+                              <div
+                                className="optDisabled"
+                                onClick={() => setStrike(index)}
+                              >
+                                {isStrikeItems[index] ? (
+                                  <span className="undoCls">Undo</span>
+                                ) : (
+                                  <span className="iconWrapper strikeIcon">
+                                    {convertToLetter(index + 1)}
+                                  </span>
+                                )}
+                              </div>
                             )}
                           </div>
-                        )}
-                      </div>
-                    ))
-                  )}
+                        ))
+                      )}
+                  </div>
+                )}
               </div>
             )}
           </div>
-        )}
-      </div>
+        </>
+      )}
 
       <div>
         <Footer
           onSubmit={handleSubmit}
           onPrevious={handlePreviousClick}
           onNext={handleNextClick}
-          onClickAnalysis={ handleAnalysisClick}
-          currentQuestionIndex={currentQuestionIndex}
-          totalQuestions={palletQuestionBoxData.questionsData.length} 
+          onClickAnalysis={handleAnalysisClick}
+          currentQuestionIndex={currentQuestionIndex.current}
+          totalQuestions={palletQuestionBoxData.questionsData.length}
+          submitNotAllowed={submitNotAllowed}
         />
         {isSubmit.modalShowHideStatus && (
           <AlertModal
             isSubmitTest={{ isSubmit, setIsSubmit }}
-            message={
-              <>
-                Are you sure that you want to submit this question If you click{" "}
-                <b>Continue,</b> you will not be able to return to this question
-                later.
-              </>
-            }
+            message={isSubmit.message}
           />
         )}
         {isSubmit.isSubmitQuestionLoader && (
@@ -597,6 +660,20 @@ export default function QuestionArea({ questionAreaProps }) {
         isNewAnnotate={isNewAnnotate}
         deleteAnnotate={deleteAnnotate}
       />
+      {
+        <Analysis
+          isVisible={showAnalysisOnly}
+          onClose={handleAnalysisClick}
+          questionAnalysis={questionsDataLoaded}
+          palletQuestionBoxData={palletQuestionBoxData?.questionsData[currentQuestionNo]} 
+          questionPassageSts={questionPassageSts}
+          questionText={questionText}
+          questionsOptionsArr={questionsOptionsArr}
+          quesRightAns={decryptPassword(atob(quesRightAns))}
+          selectedAnswers={selectedAnswers}
+          questionSolution={questionSolution}
+        />
+      }
     </>
   );
 }

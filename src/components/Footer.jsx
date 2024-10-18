@@ -1,20 +1,21 @@
 import React from 'react';
 import { Button } from './Button';
 
-function Footer ({ onSubmit, onPrevious, onNext, onClickAnalysis, currentQuestionIndex, totalQuestions }){
- 
-  
+function Footer ({ onSubmit, onPrevious, onNext, onClickAnalysis, currentQuestionIndex, totalQuestions ,submitNotAllowed}){ 
   return (
     <footer className="footer">
       <div className="nxtPrevBtn">
-        <Button
-          type="button"
-          title="Submit"
-          className="commonBtn submitBtn"
-          onClick={onSubmit}
-        >
-          Submit
-        </Button>
+        {submitNotAllowed &&
+          <Button
+            type="button"
+            title="Submit"
+            className="commonBtn submitBtn"
+            onClick={onSubmit}
+          >
+            Submit
+          </Button>
+        }
+      {!submitNotAllowed &&
         <Button
           type="button"
           title="Analysis"
@@ -23,9 +24,10 @@ function Footer ({ onSubmit, onPrevious, onNext, onClickAnalysis, currentQuestio
         >
           Analysis
         </Button>
+      }
       </div>
       <div className="nxtPrevBtn">
-        {currentQuestionIndex.current > 0 && (
+        {currentQuestionIndex > 0 && (
           <Button
             type="button"
             title="Previous Question"
@@ -39,13 +41,13 @@ function Footer ({ onSubmit, onPrevious, onNext, onClickAnalysis, currentQuestio
             /> Prev Ques.
           </Button>
         )}
-        {currentQuestionIndex.current < totalQuestions - 1 && (
+        {currentQuestionIndex < totalQuestions - 1 && (
           <Button
             type="button"
             title="Next Question"
             className="commonBtn next-Btn"
             onClick={onNext}
-            disabled={currentQuestionIndex.current === totalQuestions - 1} // Disable if at last question
+            disabled={currentQuestionIndex === totalQuestions - 1} // Disable if at last question
           >
             Next Ques.
             <img 

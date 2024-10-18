@@ -100,15 +100,15 @@ body {
 }
 
 .pallet-button-move {
-  right: 260px;
+  right: 18rem;
   transition: right 0.3s ease;
 }
 
 .side-panel {
   position: fixed;
   top: 0;
-  right: -16.25rem;
-  width: 16.25rem;
+  right: -18rem;
+  width: 18rem;
   height: 100%;
   background-color: #FFFFFF;
   box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.5);
@@ -194,6 +194,7 @@ body::-webkit-scrollbar-thumb:hover {
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.625rem;
   margin-top: 1.5rem;
+  
 }
 
 .question-box-container .ques-box {
@@ -344,7 +345,7 @@ body::-webkit-scrollbar-thumb:hover {
   background: black;
   transform: rotate(325deg);
   transform-origin: top right;
-  z-index: 6;
+  /* z-index: 6; */
 }
 
 .abc-badging span {
@@ -375,6 +376,7 @@ body::-webkit-scrollbar-thumb:hover {
   border-radius: 5px;
   border: 1px solid #FFFFFF;
   z-index: 10;
+  text-transform: capitalize;
 }
 
 .selectedVal:after {
@@ -394,6 +396,7 @@ body::-webkit-scrollbar-thumb:hover {
   text-overflow: ellipsis;
   padding-right: 1.2rem;
   font-size: 0.875rem;
+  text-transform: capitalize;
 }
 
 .selectItems .optionItem {
@@ -616,4 +619,22 @@ span.undoCls {
 .style1{
   font-size: unset !important;
   color: var(--textColor) !important;
+}
+
+.correct-Ques {
+  border: 1px solid var(--colorSuccess);
+}
+
+.correct-Ques span{
+  color: var(--colorSuccess);
+  font-weight: 800;
+}
+
+.incorrect-Ques {
+  border: 1px solid var(--colorDanger);
+}
+
+.incorrect-Ques span{
+  color: var(--colorDanger);
+  font-weight: 800;
 }

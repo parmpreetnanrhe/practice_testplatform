@@ -141,13 +141,13 @@ export default function CalcModal({ isOpen, showCalc }) {
       <div className="calcHeader">
         <div className="title">Calculator</div>
         <div className="dragTitle"> 
-          <div class="more-vertical">
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div> 
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div> 
+          <div className="more-vertical">
+            <div className="dot"></div>
+            <div className="dot"></div>
+            <div className="dot"></div> 
+            <div className="dot"></div>
+            <div className="dot"></div>
+            <div className="dot"></div> 
           </div> 
         </div>
         <div className="expendClose">

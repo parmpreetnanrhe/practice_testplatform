@@ -15,7 +15,7 @@
     font-size: 10px;
 }
 
-.fullscreen-loader h2,h3{
+.fullscreen-loader h2,.fullscreen-loader  h3{
     color: #f3f3f3;
     margin-top: 10px ;
 }

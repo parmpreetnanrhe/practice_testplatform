@@ -1,6 +1,6 @@
 import React from 'react';
 import './FullScreenLoader.css'; // Import the CSS file for styling
-import {IMAGE_URL} from "../../commonFunctions/Constants";
+import {IMAGE_URL} from "../../config/commonFunctions/Constants";
 
 const FullScreenLoader = ({loaderShowHide,text}) => {
     return (
