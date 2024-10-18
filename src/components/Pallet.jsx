@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Button } from "./Button";
 import SelectComponent from "./SelectComponent";
 import QuestionArea from "./QuestionArea";
@@ -7,6 +7,11 @@ import FullScreenLoader from "./modalComponent/FullScreenLoader";
 import { PracticeQuePalletApi } from "../apis/PracticeQuePalletApi";
 
 export default function Pallet() {
+  const itemsRef = useRef([]);
+ 
+  const updateItem = (index, ...newValue) => {  
+    itemsRef.current[index] = newValue; 
+  };
   const [questionsDataLoaded, setQuestionsDataLoaded] = useState([]);
   const [currentQuestionNo, setCurrentQuestionNo] = useState(0);
   const [categoryNamesArray, setCategoryNamesArray] = useState([]);
@@ -148,7 +153,8 @@ export default function Pallet() {
             questionAreaVisible,
             showAnalysisOnly,
             setShowAnalysisOnly,
-            setPalletQuestionCorrectIncorrect
+            setPalletQuestionCorrectIncorrect,
+            itemsRef,
           }}
         />
       )}
@@ -215,24 +221,37 @@ export default function Pallet() {
                 let questionResult = queData.attemptsData?.[0]?.analysisData?.result || 0; 
                 
                 const submitUpdateResult = palletQuestionCorrectIncorrect?.filter((data) => data.currentQuestionNo === index);  
-                if (submitUpdateResult.length > 0) { 
+                if (submitUpdateResult.length > 0) {  
                   if(submitUpdateResult[0].quesRightAns == submitUpdateResult[0].selectedAnswers){
                     questionResult = 1;
                   }else{
                     questionResult = 2;
-                  }  
+                  }   
+                  updateItem(index,{questionResult:questionResult,answerGiven:submitUpdateResult[0].selectedAnswers})    
                 }
                 
-                const resultClass = questionResult === 1 ? "correct-Ques" : questionResult === 2 ? "incorrect-Ques" : "";
+                // const resultClass = questionResult === 1 ? "correct-Ques" : questionResult === 2 ? "incorrect-Ques" : "";
 
-                const quesPayloadLink = questionResult > 0 ? queData.analysisLink : queData.platformLink;  
+                // const quesPayloadLink = questionResult > 0 ? queData.analysisLink : queData.platformLink;  
+
+                // Check if questionResult exists using optional chaining
+               questionResult = itemsRef?.current[index]?.[0] ? itemsRef?.current[index]?.[0]?.questionResult  : questionResult; 
+              // Determine the class based on questionResult
+              const resultClass =
+                questionResult === 1
+                  ? "correct-Ques"
+                  : questionResult === 2
+                  ? "incorrect-Ques"
+                  : ""; 
+              // Determine the link based on questionResult
+              const quesPayloadLink =  questionResult > 0 ? queData.analysisLink : queData.platformLink;
 
                 return (
                   <div
                     key={queData.questionId}
                     className={`ques-box ${index === currentQuestionNo && questionAreaVisible ? "disabledEvents" : ""} ${resultClass}`}
                     onClick={() => {
-                      if (!questionAreaVisible || queData.index !== currentQuestionNo) {
+                      if (!questionAreaVisible || index !== currentQuestionNo) {
                         handleQuestionClick(quesPayloadLink, index, queData.questionId);
                       }
                     }}

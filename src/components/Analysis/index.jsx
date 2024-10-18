@@ -26,13 +26,14 @@ const Analysis = ({
       item.questions.forEach((question) => { 
         if(typeof question.answerGiven != "undefined"){
           answerGiven = atob(question.answerGiven); 
+        }
+        else{
+          answerGiven = selectedAnswers;
         }  
       });
     });
     
-  } 
-
-  console.log('questionAnalysis', questionAnalysis)
+  }  
   const correctAnswer = palletQuestionBoxData?.correctAnswer;
 
   return (
@@ -41,9 +42,9 @@ const Analysis = ({
         <div className="popup">
           <div className="popup-header">
             <h3>Verbal Ability | Question: {currentQuestionCount}</h3>
-            <span className="close-btn" onClick={onClose}>
+            {/* <span className="close-btn" onClick={onClose}>
               &times;
-            </span>
+            </span> */}
           </div>
           <div className="popup-content">
             {questionPassageSts.qp_status && (

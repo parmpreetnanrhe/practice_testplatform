@@ -26,7 +26,8 @@ export default function QuestionArea({ questionAreaProps }) {
     questionAreaVisible,
     showAnalysisOnly,
     setShowAnalysisOnly,
-    setPalletQuestionCorrectIncorrect
+    setPalletQuestionCorrectIncorrect,
+    itemsRef
   } = questionAreaProps;
 
   const [loaderText, setLoaderText] = useState({
@@ -112,23 +113,11 @@ export default function QuestionArea({ questionAreaProps }) {
     let questionResult = 0; // unattempted
     if (dataLoaded?.attemptsData?.length > 0) {
       questionResult = dataLoaded?.attemptsData[0].analysisData.result;
+    }else if(itemsRef.current[currentQuestionIndexVal]){ 
+      questionResult = itemsRef?.current[currentQuestionIndexVal]?.[0]?.questionResult; 
+      setSelectedAnswers(itemsRef?.current[currentQuestionIndexVal]?.[0]?.answerGiven);
     }
-
-    questionsDataLoaded.testData[0]?.sectionsData.forEach((item) => {
-      item.questions.forEach((question) => { 
-        if(typeof question.answerGiven != "undefined"){
-          let answerGiven = atob(question.answerGiven); 
-          if(answerGiven == quesRightAns){
-            questionResult = 1;
-          }else{
-            questionResult = 2;
-          }
-        }  
-      });
-    });
-
- 
-
+   
     let quesPayloadLink = dataLoaded?.platformLink;
     if (questionResult > 0) {
       quesPayloadLink = dataLoaded?.analysisLink;
@@ -156,13 +145,15 @@ export default function QuestionArea({ questionAreaProps }) {
           quesArray = questions;
         });
       });
-      let base64EncodedText = quesArray.questionText;
+
       let base64EncodedQuestionPassage = quesArray.questionPassage;
+      let base64EncodedText = quesArray.questionText;
       let base64EncodedQuestionSolution= quesArray.solution;
       let questionsOptionsArr = quesArray.questionsOptions;
       let decodedQuestionText = base64EncodedText
         ? decryptPassword(atob(base64EncodedText))
         : "";
+        
       if (base64EncodedQuestionPassage) {
         const questionPassage = decryptPassword(
           atob(base64EncodedQuestionPassage)
@@ -517,7 +508,7 @@ export default function QuestionArea({ questionAreaProps }) {
       handleAnalysisClick();
       setSubmitNotAllowed(false);
     } 
-  }, []);
+  }, []); 
   return (
     <>
       {showScreenLoader && (
@@ -670,7 +661,7 @@ export default function QuestionArea({ questionAreaProps }) {
           questionText={questionText}
           questionsOptionsArr={questionsOptionsArr}
           quesRightAns={decryptPassword(atob(quesRightAns))}
-          selectedAnswers={selectedAnswers}
+          selectedAnswers={itemsRef?.current[currentQuestionNo]?.[0]?.answerGiven}
           questionSolution={questionSolution}
         />
       }
