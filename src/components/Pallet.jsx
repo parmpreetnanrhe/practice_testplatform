@@ -58,16 +58,16 @@ export default function Pallet() {
   const togglePanel = () => {
     if (!disabled) {
       setIsPalletOpen((prev) => !prev);
-      setShowScreenLoader((prev) => !prev);
+      // setShowScreenLoader((prev) => !prev);
       setLoaderText({ loaderShowHide: false, loaderText: "" });
-    }
+    } 
   };
 
   const handleQuestionClick = useCallback(
     async (platformLink, questionNo, questionId) => {
       // setIsPalletOpen(false);
       setQuestionAreaVisible(false);
-      setShowScreenLoader(true);
+      setShowScreenLoader(false);
       setLoaderText({ loaderShowHide: true, loaderText: "Please wait while we are loading..." });
       setDisabled(true);
 
@@ -174,6 +174,7 @@ export default function Pallet() {
   }, [handlePalletLoadApi]);
 
 
+  console.log('setShowScreenLoader', showScreenLoader)
   return (
     <>
       {questionAreaVisible && (
@@ -196,9 +197,9 @@ export default function Pallet() {
           }}
         />
       )} 
-      {/* {showScreenLoader && (
+      {showScreenLoader && (
         <FullScreenLoader loaderShowHide={loaderText.loaderShowHide} text={loaderText.loaderText} />
-      )} */}
+      )}
 
       <div className={`sideBarContainer`}> 
       <div
