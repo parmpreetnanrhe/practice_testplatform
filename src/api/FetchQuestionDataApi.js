@@ -1,23 +1,32 @@
 import axios from 'axios';
+import {urlStringObj} from "../config/commonFunctions/getQueryStringParams.js"
 
-export const FetchQuestionDataApi = async (payLoads) => {
-  const BASE_API_URL = process.env.REACT_APP_API_URL
+export const FetchQuestionDataApi = async (payLoads,getURLString) => { 
+
+  let BASE_API_URL = process.env.REACT_APP_API_URL+'/app/api/practiceQueDataFetchApiGeneric.php';  
+  if (getURLString?.domainType == 2) {
+     BASE_API_URL = process.env.REACT_APP_MONGO_URL; 
+  }
+  const {clientId,userId} = getURLString; 
+
+ 
   const payload = {
     dev: 10,
     platform: "android",
     app_flag: 11,
     app_type: "mycoach",
-    client_id: 5480,
+    client_id: clientId,
     version: 93,
     device_id: "587831233a4827f7",
     device_details: "MANUFACTURER=samsung MODEL=SM-E225F RELEASE=13 SDK=TIRAMISUDevice Id TP1A.220624.014",
     user_type: 0,
-    user_idd: 496956,
-    user_id: 496956,
-    beta_idd: 496956,
-    beta_id: 496956,
-    cms_id: 496956,
-    payLoads // Adding payLoads dynamically to the payload
+    user_idd: userId,
+    user_id: userId,
+    beta_idd: userId,
+    beta_id: userId,
+    cms_id: userId,
+    jwtToken:urlStringObj.jwtToken,
+    payLoads // Adding payLoads dynamically to the payload,
   };
   const queryString = Object.keys(payload)
     .map(key => `${key}=${payload[key]}`)
@@ -25,7 +34,7 @@ export const FetchQuestionDataApi = async (payLoads) => {
  
   try {
     const response = await axios.post(
-      `${BASE_API_URL}/app/api/practiceQueDataFetchApiGeneric.php`,
+      `${BASE_API_URL}`,
       queryString,
       { 
         headers: {

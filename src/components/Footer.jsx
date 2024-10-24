@@ -1,9 +1,9 @@
 import React from 'react';
 import { Button } from './Button';
 
-function Footer ({ onSubmit, onPrevious, onNext, onClickAnalysis, currentQuestionIndex, totalQuestions ,submitNotAllowed}){ 
+function Footer ({ onSubmit, onPrevious, onNext, onClickAnalysis, currentQuestionIndex, totalQuestions ,submitNotAllowed,isPalletOpen}){ 
   return (
-    <footer className="footer">
+    <footer className={`footer  ${isPalletOpen ? "shrinked" : ""}`}>
       <div className="nxtPrevBtn">
         {submitNotAllowed &&
           <Button

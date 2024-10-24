@@ -2,7 +2,19 @@
   box-sizing: border-box;
   font-family: "Arial";
 }
-
+main.mainContainer {
+  width: 100%;
+  position: relative;
+  display: block;
+  transition: width 0.3s linear,margin-left 0.3s linear,display 0.3s linear;
+}
+main.mainContainer.shrinked {
+  width: calc(100% - 18rem);
+  margin-left: 18rem;
+}
+.boldText{
+  font-weight: bold;
+}
 button {
   cursor: pointer;
 }
@@ -20,6 +32,8 @@ body {
   align-items: center;
   padding: 0.625rem 0.938rem;
   background-color: #2a404b;
+  min-height: 3.22rem;
+  max-height: 3.22rem;
 }
 
 .headerTitle {
@@ -32,7 +46,7 @@ body {
   display: grid;
   justify-content: space-between;
   align-items: center;
-  padding: 0.625rem 0.938rem;
+  padding: 0.625rem;
   background-color: #ffffff;
   box-shadow: 0 4px 5px rgba(0, 0, 0, 0.2);
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -43,23 +57,30 @@ body {
   bottom: 0;
   left: 0;
   width: 100%;
-  background-color: #FFFFFF;
+  background-color: #eaebef;
   color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 0.5rem solid #eaebef;
   padding: 0.625rem 0.938rem;
+  flex-direction: row-reverse;
+  transition: width 0.3s linear,margin-left 0.3s linear,display 0.3s linear;
+}
+
+.footer.shrinked{
+  width: calc(100% - 18rem);
+  margin-left: 18rem;
 }
 
 .commonBtn {
-  background: var(--colour44);;
+  background: var(--colour44);
+  font-weight: bold;
   border: none;
   color: #ffffff;
   border-radius: 4px;
   font-size: 1rem;
   padding: 0rem 1rem;
-  line-height: 2;
+  line-height: 2rem;
   cursor: pointer;
 }
 
@@ -74,10 +95,10 @@ body {
  
 .pallet-button {
   position: fixed;
-  right: 0.4rem;
+  left: 0;
   top: 50%;
   transform: translateY(-50%);
-  padding: 1px 2px;
+  /* padding: 1px 2px; */
   color: white;
   border: none;
   border-radius: 5px;
@@ -87,8 +108,8 @@ body {
 }
 
 .pallet-button button {
-  background-color: var(--colour44);;
-  width: 20px;
+  background-color: var(--colour44);
+  width: 25px;
   height: 30px;
   color: white;
   border: 0;
@@ -100,26 +121,37 @@ body {
 }
 
 .pallet-button-move {
-  right: 18rem;
-  transition: right 0.3s ease;
+  left: 18rem;
+  transition: left 0.3s linear;
 }
-
+.sideBarContainer {
+  height: calc(100dvh - 3.22rem);
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  /* width: 100%; */
+  /* background: rgba(0, 0, 0, 0.8); */
+}
+.sideBarContainer.open{
+  background: none;
+}
 .side-panel {
-  position: fixed;
+  border-right: 5px solid var(--colour43);
+  position: absolute;
   top: 0;
-  right: -18rem;
+  left: -18rem;
   width: 18rem;
   height: 100%;
   background-color: #FFFFFF;
   box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.5);
-  transition: right 0.3s ease;
+  transition: left 0.3s linear;
   padding: 1rem;
   overflow: auto;
   z-index: 9;
 }
 
 .side-panel.open {
-  right: 0;
+  left: 0;
 }
 
 .side-panel h2 {
@@ -220,7 +252,6 @@ body::-webkit-scrollbar-thumb:hover {
 .main-title {
   color: #636060;
   font-size: 1.2rem;
-  margin: 0;
 }
 
 .subHeaderIconBar {
@@ -277,33 +308,26 @@ body::-webkit-scrollbar-thumb:hover {
 .prev-Btn{
   background: #d3d3d3; 
   color: black;
-  border-radius: 4px;
-  font-size: 1rem;
-  padding: 0rem 1rem;
-  line-height: 2; 
 
 }
 .next-Btn{
-  background: #d3d3d300; 
-  color: black;
-  border-radius: 4px;
-  font-size: 1rem;
-  padding: 0rem 1rem;
-  line-height: 2; 
+  background: var(--colour1); 
+  color: #4e9bcc;
   border: 1px solid #4e9bcc;
 }
 
 
-.question-main-container {
-  height: calc(100vh - 10.98rem);
-  padding: 1.25rem;
+.question-main-container { 
   overflow: auto;
   display: flex; 
   justify-content: center;
+  transition: display 0.5s linear;
 }
-.question-container{
+.question-container {
   width: 50%;
-  padding: 0.8rem;
+  padding: 1.25rem 2.50rem;
+  height: calc(100dvh - 10.52rem);
+  overflow: auto;
 }
 
 .question-header{ 
@@ -401,7 +425,7 @@ body::-webkit-scrollbar-thumb:hover {
 
 .selectItems .optionItem {
   border-bottom: 1px dashed #D6D6D6;
-  padding: 0.5rem 0.5rem;
+  padding: 0.5rem 0;
   font-size: 0.75rem;
   border: none; /* Remove default border */
    /* Adjust padding as needed */
@@ -417,7 +441,7 @@ body::-webkit-scrollbar-thumb:hover {
 
 .quesOpt {
   display: flex;
-  padding: 1rem;
+  padding: 0.5rem;
   border: solid 1px #ccc;
   border-radius: 5px;
   position: relative;
@@ -425,9 +449,12 @@ body::-webkit-scrollbar-thumb:hover {
   cursor: pointer !important;
   -webkit-transition: opacity 0.2s ease-out !important;
   align-items: center;
-  margin-bottom: 1rem;
   gap: 1rem;
   width: 100%;
+}
+
+.quesOptions:last-child{
+  margin-bottom: 0;
 }
 
 .single-question label:has(input:checked) {
@@ -444,7 +471,7 @@ span.optionTxt {
   font-weight: 400;
   color: var(--textColor);
   line-height: 1.688rem;
-  margin: 1.5rem 0 1.5rem 0;
+  margin: 1rem 0;
 }
 
 .perseusInteractive input {display: none;}
@@ -505,7 +532,7 @@ div.loading{
   padding: .5rem
 }
 .selectOptions div{
-  padding: .5rem;
+  padding: .7rem 0;
 }
 
 div.loading::after {
@@ -537,6 +564,7 @@ div.loading::after {
   justify-content: space-between;
   align-items: center;
   gap: 2rem;
+  margin-bottom: 1rem;
 }
 
 .optDisabled {
@@ -605,11 +633,9 @@ span.undoCls {
   background: var(--colour44);
 }
 
-.left-question-area{
-  width: 50%;
-  border-right: 5px solid ;
+.left-question-area {
+  border-right: 5px solid;
   border-color: var(--colour43);
-  padding: 0.8rem;
 }
 
 .holding {
@@ -617,7 +643,7 @@ span.undoCls {
 }
 
 .style1{
-  font-size: unset !important;
+  font-size: var(--pageFonttSize) !important;
   color: var(--textColor) !important;
 }
 
@@ -637,4 +663,26 @@ span.undoCls {
 .incorrect-Ques span{
   color: var(--colorDanger);
   font-weight: 800;
+}
+
+.flag-Ques {
+  position: relative;
+  border: 1px solid var(--colorWarning);
+}
+
+.flag-Ques::after {
+  content: "";
+  background: var(--colorWarning);
+  position: absolute;
+  top: -8px;
+  right: -2px;
+  /* background-color: white; */
+  border-radius: 18%;
+  width: 12px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  border: 1px solid var(--colorWarning);
 }

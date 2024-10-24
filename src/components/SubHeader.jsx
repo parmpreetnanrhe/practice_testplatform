@@ -3,9 +3,8 @@ import { Button } from './Button';
 import { Headings } from './Headings';
 import { TestInfoContext } from '../contexts/TestInfoContext';
 
-export default function SubHeader({ testTimeStarts, currentQuestionCount, showCalc, annotateFunc, selectedText, isTxtSelected, annotateRef ,sectionName }) {
+export default function SubHeader({ testTimeStarts, currentQuestionCount, handleFlag ,showCalc, annotateFunc, selectedText, isTxtSelected, annotateRef ,sectionName }) {
 const TestInfoData = useContext(TestInfoContext);  
-
 
 const [testTimeSpent, setTestTimeSpent] = useState(testTimeStarts); 
  
@@ -27,6 +26,46 @@ const formatTime = (seconds) => {
     minutes > 0 ? "min" : "sec"
   }`;
 };
+
+const [boldStates, setBoldStates] = useState({
+    flag: false,
+    calculator: false,
+    annotate: false,
+    references: false,
+  });
+
+  const toggleBold = (buttonType) => {
+    setBoldStates((prevState) => ({
+      ...prevState,
+      [buttonType]: !prevState[buttonType],
+    }));
+  };
+
+  const handleButtonClick = (buttonType) => {
+    setBoldStates((prevState) => ({
+      ...prevState,
+      [buttonType]: !prevState[buttonType],
+    }));
+       toggleBold();
+    // Handle additional actions based on button type
+    switch (buttonType) {
+      case "flag":
+        handleFlag();
+        break;
+      case "calculator":
+        showCalc();
+        break;
+      case "annotate":
+        annotateFunc(selectedText)
+        // Assuming you have logic for annotating selected text
+        break;
+      case "references":
+        console.log("References button clicked!");
+        break;
+      default:
+        break;
+    }
+  };
 
   return (
     <header className="sub-header">
@@ -50,8 +89,8 @@ const formatTime = (seconds) => {
         <Button
           type="button"
           title="Flag"
-          className="commonBtn iconBtn"
-          onClick={() => console.log("Submit clicked!")}
+          className={`commonBtn iconBtn ${boldStates.flag ? "boldText" : ""}`}
+          onClick={()=>handleButtonClick("flag")} 
         >
           <img
             src={`${process.env.PUBLIC_URL}/img/flagIcon.svg`}
@@ -63,8 +102,8 @@ const formatTime = (seconds) => {
         <Button
           type="button"
           title="Calculator"
-          className="commonBtn iconBtn"
-          onClick={() => showCalc()}
+          className={`commonBtn iconBtn ${boldStates.calculator ? "boldText" : ""}`}
+          onClick={()=>handleButtonClick("calculator")} 
         >
           <img
             src={`${process.env.PUBLIC_URL}/img/calcIcon.svg`}
@@ -76,8 +115,8 @@ const formatTime = (seconds) => {
         <Button
           type="button"
           title="Annotate"
-          className="commonBtn iconBtn"
-          onClick={() => annotateFunc(selectedText)}
+          className={`commonBtn iconBtn ${boldStates.annotate ? "boldText" : ""}`}
+          onClick={()=>handleButtonClick("annotate")} 
         >
           <img
             src={`${process.env.PUBLIC_URL}/img/annotateIcon.svg`}
@@ -86,7 +125,7 @@ const formatTime = (seconds) => {
           <span>Annotate</span>
         </Button>
 
-        <Button
+        {/* <Button
           type="button"
           title="References"
           className="commonBtn iconBtn"
@@ -97,7 +136,7 @@ const formatTime = (seconds) => {
             alt="References Icon"
           />
           <span>References</span>
-        </Button>
+        </Button> */}
 
         {isTxtSelected && (
           <div className='validateAnnotate'>

@@ -3,7 +3,7 @@ import "../../css/variables.css";
 import "./AlertModal.css";
 import { Button } from "../Button";
 
-export default function AlertModal({ message, isSubmitTest }) {
+export default function AlertModal({ message, isSubmitTest , isPalletOpen}) {
   const closeModal = () => {
     isSubmitTest.setIsSubmit((prevState) => ({
       ...prevState,
@@ -31,7 +31,7 @@ export default function AlertModal({ message, isSubmitTest }) {
   return (
     <div>
       {isSubmitTest.isSubmit.modalShowHideStatus && (
-        <div className="modalBox">
+        <div className={`modalBox ${isPalletOpen ? "shrinked" : ""}`}>
           <div className="modalContent">
             <div className="modalHeader">
               <h4>Alert!</h4>

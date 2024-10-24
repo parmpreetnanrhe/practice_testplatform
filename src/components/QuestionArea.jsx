@@ -6,7 +6,7 @@ import CalcModal from "./modalComponent/CalcModal";
 import Annotate from "./modalComponent/Annotate";
 import Input from "./Input";
 import SubHeader from "./SubHeader";
-import { SubmitApi } from "../apis/SubmitApi";
+import { SubmitApi } from "../api/SubmitApi";
 import AlertModal from "./modalComponent/AlertModal";
 import FullScreenLoader from "./modalComponent/FullScreenLoader";
 import parse from "html-react-parser";
@@ -28,7 +28,10 @@ export default function QuestionArea({ questionAreaProps }) {
     setShowAnalysisOnly,
     setPalletQuestionCorrectIncorrect,
     itemsRef,
-    sectionName
+    sectionName,
+    setFlagSts,
+    getURLString,
+    isPalletOpen
   } = questionAreaProps; 
   const [loaderText, setLoaderText] = useState({
     loaderShowHide: false,
@@ -141,61 +144,39 @@ export default function QuestionArea({ questionAreaProps }) {
       let quesArray = {};
       let encodedString = questionsDataLoaded.testData[0]?.sectionsData;
       encodedString?.map((item) => {
-        item.questions?.map((questions) => {
+        item.questionsData?.map((questions) => {
           quesArray = questions;
         });
       });
 
       let base64EncodedQuestionPassage = quesArray.questionPassage;
+      if (base64EncodedQuestionPassage) {
+        const questionPassage = 
+          atob(base64EncodedQuestionPassage)
+        ;
+        setQuestionPassageSts({
+          questionPassage: questionPassage,
+          qp_status: true,
+        });
+
+      }
+
+      setShowScreenLoader(false);
       let base64EncodedText = quesArray.questionText;
       let base64EncodedQuestionSolution= quesArray.solution;
       let questionsOptionsArr = quesArray.questionsOptions;
       let decodedQuestionText = base64EncodedText
-        ? parse(decryptPassword(atob(base64EncodedText)))
-        : "";
-
-      if (base64EncodedQuestionPassage) {
-        const questionPassage = decryptPassword(
-          atob(base64EncodedQuestionPassage)
-        );
-        fetchFileContent(questionPassage);
-      } else {
-        setShowScreenLoader(false);
-      }  
+        ? parse(atob(base64EncodedText))
+        : ""; 
 
       setQuesRightAns(quesArray.rightAnswer);
-      setQuestionSolution((base64EncodedQuestionSolution ? parse(decryptPassword(atob(base64EncodedQuestionSolution))) : "")) 
+      setQuestionSolution((base64EncodedQuestionSolution ? parse(atob(base64EncodedQuestionSolution)) : "")) 
       setCurrentQuestionId(quesArray.questionId);
       setquestionsOptionsArr(questionsOptionsArr); 
       setQuestionText(decodedQuestionText);
     }
-  }, [questionsDataLoaded, annotateData, currentQuestionId]);
+  }, [questionsDataLoaded]);
 
-  const fetchFileContent = useCallback((passageContent) => { 
-    setLoaderText({
-      loaderShowHide: true,
-      loaderText: "Please wait while we are loading...",
-    });
-    const path = `${TCY_URL}${passageContent}`;
-    fetch(path)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.text();
-      })
-      .then((data) => {
-        const plainText = data;
-        setShowScreenLoader(false);
-        setQuestionPassageSts({
-          questionPassage: parse(updateImageSrcInString(plainText)),
-          qp_status: true,
-        });
-      })
-      .catch((error) => {
-        console.error("Error fetching file:", error);
-      });
-  }, []);
 
   // handle Question Submit
   const handleSubmit = (e) => {
@@ -215,15 +196,19 @@ export default function QuestionArea({ questionAreaProps }) {
         message: continueBtnMessage,
       }));
     }
+ 
+    questionsDataLoaded.api = "submitQues";
+
     questionsDataLoaded.testData[0]?.sectionsData.forEach((item) => {
-      item.questions = item.questions.map((question) => {
+      item.questionsData = item.questionsData.map((question) => {
         return {
           ...question,
           answerGiven: btoa(selectedAnswers),
-          testTimeSpent: testTimeSpentRef.current,
+          timeSpent: testTimeSpentRef.current,
         };
       });
     });
+    console.log('questionsDataLoaded', questionsDataLoaded);
     handleQuestionSubmit(questionsDataLoaded);
   };
 
@@ -248,7 +233,7 @@ export default function QuestionArea({ questionAreaProps }) {
         isSubmitQuestionLoader: true,
         modalShowHideStatus: false,
       }));
-      await SubmitApi(questionsDataLoaded)
+      await SubmitApi(questionsDataLoaded,getURLString)
         .then((data) => {
           if (data.success == 0) {
             setIsSubmit((prevState) => ({
@@ -267,7 +252,7 @@ export default function QuestionArea({ questionAreaProps }) {
  
             setPalletQuestionCorrectIncorrect([{
               currentQuestionNo:currentQuestionNo,
-              quesRightAns: decryptPassword(atob(quesRightAns)),
+              quesRightAns: atob(quesRightAns),
               selectedAnswers: selectedAnswers,
           }]);
           } else {
@@ -312,8 +297,8 @@ export default function QuestionArea({ questionAreaProps }) {
     });
   }, [annotateData]); // Dependency array, runs when dummyValue changes
 
-  useEffect(() => {
-    if (showAnalysisOnly) {
+  useEffect(() => { 
+    if (!showAnalysisOnly) {
       // Start the timer
       intervalRef.current = setInterval(() => {
         testTimeSpentRef.current += 1;
@@ -344,6 +329,25 @@ export default function QuestionArea({ questionAreaProps }) {
   }, [isOpenAnnotate]);
 
   // ---------- End --------
+
+
+  const handleFlag = () => {
+    setFlagSts((prevFlagSts) => {
+      // Check if the current question number is already in the list
+      const existingFlag = prevFlagSts.find(item => item.currentQuestionNo === currentQuestionNo); 
+      if (existingFlag) {
+        // Toggle flag if the question number exists
+        return prevFlagSts.map(item =>
+          item.currentQuestionNo === currentQuestionNo
+            ? { ...item, flagStatus: !item.flagStatus }
+            : item
+        );
+      } else {
+        // If the question number does not exist, add a new entry with flagSts true
+        return [...prevFlagSts, { currentQuestionNo, flagStatus: true }];
+      }
+    });
+  };
 
   const showCalc = () => {
     setIsOpenCalc(!isOpenCalc);
@@ -517,11 +521,14 @@ export default function QuestionArea({ questionAreaProps }) {
           text={loaderText.loaderText}
         />
       )}
+      <main className={`mainContainer ${isPalletOpen ? "shrinked" : ""}`}>
+
       {!showAnalysisOnly && (
         <>
           <SubHeader
             testTimeStarts={parseInt(testTimeSpentRef.current)}
             currentQuestionCount={palletQuestionBoxData?.questionsData[currentQuestionNo].questionNo}
+            handleFlag = {handleFlag}
             showCalc={showCalc}
             annotateFunc={annotateFunc}
             selectedText={selectedText}
@@ -529,16 +536,15 @@ export default function QuestionArea({ questionAreaProps }) {
             annotateRef={annotateRef}
             sectionName={sectionName}
           />
-          <div className="question-main-container">
-            {questionPassageSts.qp_status && (
+          <div className="question-main-container"> 
               <LeftQuestionArea
+                questionPassageSts = {questionPassageSts.qp_status}
                 passageContent={questionPassageSts.questionPassage}
-              />
-            )}
+              /> 
             
             {questionText && (
               <div
-                className={`question-container ${
+                className={`question-container right-question-area ${
                   !questionAreaVisible ? "loading" : ""
                 } `}
               >
@@ -590,7 +596,7 @@ export default function QuestionArea({ questionAreaProps }) {
                               </div>
                               <span className="optionTxt">
                                 {parse(
-                                  decryptPassword(atob(optionsArr[index]))
+                                  atob(optionsArr[index])
                                 )}
                               </span>
                             </label>
@@ -618,8 +624,6 @@ export default function QuestionArea({ questionAreaProps }) {
           </div>
         </>
       )}
-
-      <div>
         <Footer
           onSubmit={handleSubmit}
           onPrevious={handlePreviousClick}
@@ -628,11 +632,13 @@ export default function QuestionArea({ questionAreaProps }) {
           currentQuestionIndex={currentQuestionIndex.current}
           totalQuestions={palletQuestionBoxData.questionsData.length}
           submitNotAllowed={submitNotAllowed}
+          isPalletOpen={isPalletOpen}
         />
         {isSubmit.modalShowHideStatus && (
           <AlertModal
             isSubmitTest={{ isSubmit, setIsSubmit }}
             message={isSubmit.message}
+            isPalletOpen={isPalletOpen}
           />
         )}
         {isSubmit.isSubmitQuestionLoader && (
@@ -641,7 +647,6 @@ export default function QuestionArea({ questionAreaProps }) {
             text="Submitting yor question..."
           />
         )}
-      </div>
       <CalcModal isOpen={isOpenCalc} showCalc={showCalc} />
       <Annotate
         isOpenAnnotate={isOpenAnnotate}
@@ -662,12 +667,17 @@ export default function QuestionArea({ questionAreaProps }) {
           questionPassageSts={questionPassageSts}
           questionText={questionText}
           questionsOptionsArr={questionsOptionsArr}
-          quesRightAns={decryptPassword(atob(quesRightAns))}
+          quesRightAns={atob(quesRightAns)}
           selectedAnswers={itemsRef?.current[currentQuestionNo]?.[0]?.answerGiven}
           questionSolution={questionSolution}
           sectionName={sectionName}
+          isPalletOpen={isPalletOpen}
         />
       }
+      </main>
+
+      {/* <div> */}
+      {/* </div> */}
     </>
   );
 }

@@ -1,34 +1,47 @@
 /* General Popup Styling */
 
-.popup-main{
+.popup-main {
     position: fixed;
     align-items: center;
     justify-content: center;
     width: 100%;
-    top: 0px;
+    top: 52px;
     left: 0px;
-    background: var(--colour11);
+    /* background: var(--colour11); */
     display: flex;
-    height: calc(100vh - 62px);
+    height: calc(calc(100dvh - 3.22rem) - 56px);
     z-index: 3;
+  transition: width 0.3s linear,margin-left 0.3s linear,display 0.3s linear;
+
 }
+
+.popup-main.shrinked{
+    width: calc(100% - 18rem);
+    left: 18rem;
+}
+
 .popup {
-    width: calc(100vw - 4vw); 
-    height: calc(100vh - 150px);
-    max-height: 800px;
+    width: 100dvw;
+    height: calc(calc(100dvh - 3.22rem) - 55px);
+    max-height: calc(calc(100dvh - 3.22rem) - 55px);
     background: #fff;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* border-radius: 5px; */
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
     font-family: Arial, sans-serif;
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 3.22rem;
+    left: 0;
+    /* transform: translate(-50%, -50%); */
     z-index: 1000;
     display: flex;
-    flex-direction: column; /* Flexbox layout for vertical alignment */
-    padding: 0; /* Remove padding from the popup container */
-    overflow: hidden; /* Ensures content doesn't overflow outside */
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+}
+
+.popup-main.shrinked .popup {
+    width: calc(100% - 18rem);
+    left: 18rem;
 }
 
 .popup-header {
@@ -66,7 +79,7 @@
     display: flex;
     flex-grow: 1; /* Allows the content area to take up the remaining space */
     overflow-y: auto; /* Adds a scrollbar if content exceeds available space */
-    padding: 20px;
+    /* padding: 20px 32px; */
     background-color: #fff;
 }
 
@@ -119,16 +132,16 @@
     margin: 5px 0;
     color: #555;
 }
-
-.popup-left {
+.popup-content-inner {
+    padding: 1.25rem 2.50rem;
+    height: calc(100dvh - 10.52rem);
     width: 50%;
-    padding-right: 20px; 
-    height: calc(100vh - 240px); 
-}
-
-.popup-right{
-    width: 50%;
-    padding-right: 20px; 
-    height: calc(100vh - 240px); 
     overflow: auto;
+
+}
+.popup-left {
+    /* width: 50%; */
+    /* padding-right: 20px;  */
+    /* height: calc(100vh - 240px);  */
+    border-right: 5px solid var(--colour43);
 }

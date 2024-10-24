@@ -2,13 +2,26 @@ import React, { useCallback, useContext, useEffect, useRef, useState } from "rea
 import { Button } from "./Button";
 import SelectComponent from "./SelectComponent";
 import QuestionArea from "./QuestionArea";
-import { FetchQuestionDataApi } from "../apis/FetchQuestionDataApi";
+import { FetchQuestionDataApi } from "../api/FetchQuestionDataApi";
 import FullScreenLoader from "./modalComponent/FullScreenLoader";
-import { PracticeQuePalletApi } from "../apis/PracticeQuePalletApi";
+import { PracticeQuePalletApi } from "../api/PracticeQuePalletApi";
+import {urlStringObj} from "../config/commonFunctions/getQueryStringParams.js"
 
 export default function Pallet() {
-  const itemsRef = useRef([]);
- 
+  const itemsRef = useRef([]); 
+  
+  const convertQueryStringToObject = (getURLString) => {
+    const obj = {};
+    const pairs = atob(getURLString)?.split('&');
+    pairs.forEach(pair => {
+      const [key, value] = pair?.split('=');
+      obj[decodeURIComponent(key)] = decodeURIComponent(value);
+    });
+    return obj;
+  };
+  
+  const getURLString = convertQueryStringToObject(urlStringObj.requestURI); 
+
   const updateItem = (index, ...newValue) => {  
     itemsRef.current[index] = newValue; 
   };
@@ -24,16 +37,19 @@ export default function Pallet() {
   const [currentQuestionId, setCurrentQuestionId] = useState(0);
   const [loaderText, setLoaderText] = useState({
     loaderShowHide: false,
-    loaderText: "",
+    loaderText: "", 
   });
   const [showAnalysisOnly, setShowAnalysisOnly] = useState(false);
   const [palletQuestionBoxData, setPalletQuestionBoxData] = useState([]);
   const [palletLoading, setPalletLoading] = useState(true);
   const [filterArray, setFilterArray] = useState({});
+
   const [selectedCategory, setSelectedCategory] = useState("Words in Context");
   const [selectedCategory2, setSelectedCategory2] = useState("All");
-  const [palletQuestionCorrectIncorrect,setPalletQuestionCorrectIncorrect] = useState([]);  
 
+  const [palletQuestionCorrectIncorrect,setPalletQuestionCorrectIncorrect] = useState([]);  
+  const [flagStatus,setFlagSts] = useState([]);
+ 
   const options2 = Object.keys(filterArray).map((key) => ({
     link: filterArray[key].asc,
     name: key,
@@ -49,17 +65,16 @@ export default function Pallet() {
 
   const handleQuestionClick = useCallback(
     async (platformLink, questionNo, questionId) => {
-      setIsPalletOpen(false);
+      // setIsPalletOpen(false);
       setQuestionAreaVisible(false);
       setShowScreenLoader(true);
       setLoaderText({ loaderShowHide: true, loaderText: "Please wait while we are loading..." });
       setDisabled(true);
 
       try {
-        const data = await FetchQuestionDataApi(platformLink, questionNo);
-
+        const data = await FetchQuestionDataApi(platformLink,getURLString, questionNo); 
         if (data.success) {
-          const analysisAvailable = data?.testData[0]?.sectionsData[0]?.questions[0].attemptsData?.analysisData; 
+          const analysisAvailable = data?.testData[0]?.sectionsData[0]?.questionsData[0].attemptsData?.analysisData; 
           setShowAnalysisOnly(!!analysisAvailable);
           setCurrentQuestionId(questionId);
           setQuestionsDataLoaded(data);
@@ -76,21 +91,19 @@ export default function Pallet() {
       }
     },
     []
-  );
-
+  ); 
   const handlePalletDataLoad = async (selectedCategoriesObj) => {
     setQuestionAreaVisible(false);
     setShowScreenLoader(true);
     setPalletLoading(true);
     setLoaderText({ loaderShowHide: false, loaderText: "" });
-    setPalletQuestionBoxData([]);
-
+    setPalletQuestionBoxData([]); 
     if (selectedCategoriesObj.selectCategory === "filter") {
       setSelectedCategory2(selectedCategoriesObj.subCatName);
     } else {
+      setSelectedCategory2("All")
       setSelectedCategory(selectedCategoriesObj.subCatName);
-    }
-
+    }  
     handlePalletLoadApi(
       selectedCategoriesObj.payLoadLink,
       selectedCategoriesObj.cateId,
@@ -99,26 +112,31 @@ export default function Pallet() {
   };
 
   const handlePalletLoadApi = useCallback(async (payLoads, selectedCateId, subCatId) => {
-    setDisabled(true);
-
+    setDisabled(true); 
     try {
-      const data = await PracticeQuePalletApi(payLoads);
-
+      const data = await PracticeQuePalletApi(payLoads,getURLString); 
       if (data.success) {
-        setPalletQuestionBoxData(data);
-
-        if (data.categoryNamesArray) {
-          const categories = data.categoryNamesArray
-            .filter((category) => category.subCats && category.subCats.length > 0)
+        setPalletQuestionBoxData(data); 
+        if (data.filterCategoriesList) {
+          const categories = data.filterCategoriesList.filter((category) => category.subCats && category.subCats.length > 0)
             .map((category) => ({
               value: category.cateId,
               label: category.name,
               subCatArr: category.subCats,
             })); 
-            setSectionName(data.categoryNamesArray[0].name);
+            
+            categories.forEach((category) => {
+              const result = category.subCatArr.find((item) => { 
+                return item.cateId === subCatId;
+              }); 
+              if (result) {
+                setSelectedCategory(result.name)
+              }
+            });
+            setSectionName(data.filterCategoriesList[0].name); 
             setCategoryNamesArray(categories);
             setFilterArray(
-              data.categoryNamesArray
+              data.filterCategoriesList
                 .filter((category) => category.cateId === selectedCateId)[0]
                 ?.subCats.filter((subCat) => subCatId === subCat.cateId)[0]?.filterLinks
             );
@@ -128,16 +146,33 @@ export default function Pallet() {
       }
     } catch (error) {
       console.error("Error fetching question data:", error);
-    } finally {
-      setPalletLoading(false);
-      setDisabled(false);
+    } 
+    finally {
+      setPalletLoading(false); 
     }
   }, []); 
+
+
   useEffect(() => {
-    const payLoads = "Y2twbGZPaHpgcG56fDokIiUjOCEvZHRmcE52PDckMSMlNz9uZG1xXGBmdG12cygiM2B8c3tzWXt4bmY8PjJ7fGZ3cGFpWHB+YCpge2Zie3Z8fW80b255ZnB1Rnh+cTVyeG8/fntpenpseG97R2J5fXt0XH00PiUrJTYiJ31xa2d9bHdbd3xsMzU=";
-    setSelectedCateObj({ cateId: "909010", subCatId: "909014" });
-    handlePalletLoadApi(payLoads, "909010", "909014");
+    let payLoads = "Y2twbGZPaHpgcG56fDokIiUjOCEvZHRmcE52PDckMSMlNz9uZG1xXGBmdG12cygiM2B8c3tzWXt4bmY8PjJ7fGZ3cGFpWHB+YCpge2Zie3Z8fW80b255ZnB1Rnh+cTVyeG8/fntpenpseG97R2J5fXt0XH00PiUrJTYiJ31xa2d9bHdbd3xsMzU="; 
+    let cateId = "909010";
+    let subCatId = "909010";
+
+    if(getURLString && getURLString?.domainType == 2){
+    payLoads = atob('eyJ3aGljaENhdGVnb3J5IjoxMDAwMDMsInNvcnRpbmdUeXBlIjoiYXNjZW5kaW5nIiwiZmlsdGVyVHlwZSI6ImFsbCIsImRhdGFMaW1pdCI6eyJmcm9tIjowLCJub09mUmVjVG9GZXRjaCI6NTV9LCJ1c2VySWQiOjQ5Njk1NiwiY2xpZW50SWQiOjU0ODAsImFwaSI6ImZldGNoUXVlc1BhbGV0dGUiLCJjb2xsZWN0aW9uIjoiVEVTVF9EQVRBX0NPTEwiLCJ0ZXN0Q2F0ZWdvcnkiOjkwOTAxNSwiYWN0aW9uIjoic2VsZWN0In0='); 
+    const dataObject = JSON.parse(payLoads);  
+    dataObject.testCategory = getURLString.subCateId;
+    dataObject.userId = getURLString.userId;
+    dataObject.whichCategory = getURLString.whichCategory;
+    dataObject.clientId = getURLString.clientId;
+    dataObject.testTakenId = getURLString.testTakenId; 
+    const jsonString = JSON.stringify(dataObject);
+    payLoads  = btoa(jsonString);
+  } 
+    setSelectedCateObj({ cateId: "909010", subCatId: getURLString.subCateId });  
+    handlePalletLoadApi(payLoads, "909010",getURLString.subCateId);
   }, [handlePalletLoadApi]);
+
 
   return (
     <>
@@ -154,22 +189,25 @@ export default function Pallet() {
             setShowAnalysisOnly,
             setPalletQuestionCorrectIncorrect,
             itemsRef,
-            sectionName
+            sectionName,
+            setFlagSts,
+            getURLString,
+            isPalletOpen
           }}
         />
-      )}
-
-      {showScreenLoader && (
+      )} 
+      {/* {showScreenLoader && (
         <FullScreenLoader loaderShowHide={loaderText.loaderShowHide} text={loaderText.loaderText} />
-      )}
+      )} */}
 
+      <div className={`sideBarContainer`}> 
       <div
-        className={`pallet-button ${isPalletOpen ? "pallet-button-move" : ""} ${disabled ? "disabledEvents" : ""}`}
+        className={`pallet-button ${isPalletOpen ? "pallet-button-move" : ""}`}
       >
         <Button
           type="button"
           title="Expand"
-          className="right-button"
+          className={`right-button ${disabled ? "disabledEvents" : ""}`}
           text="<"
           onClick={togglePanel}
         >
@@ -180,7 +218,6 @@ export default function Pallet() {
           />
         </Button>
       </div>
-
       <div className={`side-panel ${isPalletOpen ? "open" : ""}`}>
         <div className="select-pallet-tag">
           {palletLoading ? (
@@ -201,6 +238,7 @@ export default function Pallet() {
                 className={palletLoading ? "loading" : ""}
                 selectedCateObj={selectedCateObj}
                 setSelectedCateObj={setSelectedCateObj}
+                dropDownNo = "1"
               />
               <SelectComponent
                 options={options2}
@@ -209,6 +247,7 @@ export default function Pallet() {
                 className={palletLoading ? "loading" : ""}
                 selectedCateObj={selectedCateObj}
                 setSelectedCateObj={setSelectedCateObj}
+                dropDownNo = "2"
               />
             </>
           )}
@@ -216,10 +255,13 @@ export default function Pallet() {
 
         <div className="question-box-container">
           {palletQuestionBoxData.questionsData?.length > 0
-            ? palletQuestionBoxData.questionsData.map((queData, index) => { 
-
-                let questionResult = queData.attemptsData?.[0]?.analysisData?.result || 0; 
-                
+            ? palletQuestionBoxData.questionsData.map((queData, index) => {  
+                let questionResult = queData.attemptsData?.[0]?.analysisData?.result || 0;   
+                const existingQuesFlag = flagStatus.find(item => item.currentQuestionNo === index); 
+                let addFlagClass = ""
+                if (existingQuesFlag && existingQuesFlag.flagStatus) {
+                  addFlagClass = "flag-Ques" 
+                } 
                 const submitUpdateResult = palletQuestionCorrectIncorrect?.filter((data) => data.currentQuestionNo === index);  
                 if (submitUpdateResult.length > 0) {  
                   if(submitUpdateResult[0].quesRightAns == submitUpdateResult[0].selectedAnswers){
@@ -228,24 +270,10 @@ export default function Pallet() {
                     questionResult = 2;
                   }   
                   updateItem(index,{questionResult:questionResult,answerGiven:submitUpdateResult[0].selectedAnswers})    
-                }
-                
-                // const resultClass = questionResult === 1 ? "correct-Ques" : questionResult === 2 ? "incorrect-Ques" : "";
-
-                // const quesPayloadLink = questionResult > 0 ? queData.analysisLink : queData.platformLink;  
-
-                // Check if questionResult exists using optional chaining
-               questionResult = itemsRef?.current[index]?.[0] ? itemsRef?.current[index]?.[0]?.questionResult  : questionResult; 
-              // Determine the class based on questionResult
-              const resultClass =
-                questionResult === 1
-                  ? "correct-Ques"
-                  : questionResult === 2
-                  ? "incorrect-Ques"
-                  : ""; 
-              // Determine the link based on questionResult
-              const quesPayloadLink =  questionResult > 0 ? queData.analysisLink : queData.platformLink;
-
+                }  
+                questionResult = itemsRef?.current[index]?.[0] ? itemsRef?.current[index]?.[0]?.questionResult  : questionResult;  
+                const resultClass =  questionResult === 1 ? "correct-Ques": questionResult === 2 ? "incorrect-Ques" : addFlagClass;  
+                const quesPayloadLink =  questionResult > 0 ? queData.analysisLink : queData.platformLink;  
                 return (
                   <div
                     key={queData.questionId}
@@ -267,6 +295,11 @@ export default function Pallet() {
               ))}
         </div>
       </div>
+      </div>
+
+      
+
+      
     </>
   );
 }

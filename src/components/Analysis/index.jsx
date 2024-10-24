@@ -14,7 +14,8 @@ const Analysis = ({
   quesRightAns,
   selectedAnswers,
   questionSolution,
-  sectionName
+  sectionName,
+  isPalletOpen
 }) => {
   const currentQuestionCount = palletQuestionBoxData.questionNo; 
   let questionResult = 0; // unattempted
@@ -24,7 +25,7 @@ const Analysis = ({
     answerGiven = palletQuestionBoxData?.attemptsData[0].analysisData.answerGiven;
   } else {
     questionAnalysis.testData[0]?.sectionsData.forEach((item) => {
-      item.questions.forEach((question) => { 
+      item.questionsData.forEach((question) => { 
         if(typeof question.answerGiven != "undefined"){
           answerGiven = atob(question.answerGiven); 
         }
@@ -39,7 +40,7 @@ const Analysis = ({
 
   return (
     isVisible && (
-      <div className="popup-main">
+      <div className={`popup-main  ${isPalletOpen ? "shrinked" : ""}`}>
         <div className="popup">
           <div className="popup-header">
             <h3>{sectionName} | Question: {currentQuestionCount}</h3>
@@ -47,13 +48,17 @@ const Analysis = ({
               &times;
             </span> */}
           </div>
+
+
           <div className="popup-content">
+          <div className="popup-content-inner popup-left">
             {questionPassageSts.qp_status && (
-              <div className="popup-left">
-                {questionPassageSts.questionPassage}
-              </div>
+              <>
+                {questionPassageSts.questionPassage} 
+                </>
             )}
-            <div className="popup-right">
+             </div>
+            <div className="popup-content-inner popup-right">
               <div className="question-header">
                 <div className="ques-cnt">{currentQuestionCount}</div>
                 <div className="abc-badging"></div>
@@ -83,7 +88,7 @@ const Analysis = ({
                           key={`${arrIndex}-${index}`}
                           className={`option ${clsName}`}
                         >
-                          <p>{parse(decryptPassword(atob(option)))}</p>
+                          <p>{parse(atob(option))}</p>
                           {imgIcon && (
                             <img
                               src={`${process.env.PUBLIC_URL}/img/${imgIcon}`}

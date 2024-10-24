@@ -1,17 +1,17 @@
  import './css/main.css';
 import { MainHeader } from './components/MainHeader'; 
-import UserInfoContextProvider from './contexts/UserInfoContext'; 
-import { PracticeQuesPalletContextProvider } from './contexts/PracticeQuesPalletContext';
+import UserInfoContextProvider from './contexts/UserInfoContext';  
 import Pallet from './components/Pallet';
-import Practice from './components/Practice';
+import { BrowserRouter as Router } from 'react-router-dom';
 
 function App() {
   return (
-    <UserInfoContextProvider> 
-      {/* <Practice /> */}
+    <Router>
+    <UserInfoContextProvider>  
       <MainHeader />
       <Pallet/> 
     </UserInfoContextProvider>
+      </Router>
 
   );
 }
